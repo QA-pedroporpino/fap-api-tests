@@ -1,25 +1,25 @@
-# Script para executar todas as coleções de teste do Postman
+# Script to run all Postman test collections
 
-# Diretório das coleções
+# Collections directory
 $collectionsPath = "api-tests/collections"
 
-# Criar diretório de relatórios se não existir
+# Create reports directory if it doesn't exist
 $reportsPath = "api-tests/reports"
 if (-not (Test-Path $reportsPath)) {
     New-Item -ItemType Directory -Path $reportsPath
 }
 
-# Data e hora atual para o nome do relatório
+# Current date and time for report name
 $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
 $reportName = "test-report-$timestamp"
 
-# Criar diretório para o relatório
+# Create report directory
 $reportDir = "$reportsPath/$reportName"
 if (-not (Test-Path $reportDir)) {
     New-Item -ItemType Directory -Path $reportDir
 }
 
-# Criar arquivo temporário para listar todas as coleções
+# Create temporary file to list all collections
 $collectionsList = "collections-list.json"
 $collections = @(
     "api-tests/collections/-api-v1-clinics.postman_collection.json",
@@ -31,19 +31,19 @@ $collections = @(
 )
 $collections | ConvertTo-Json | Out-File -FilePath $collectionsList
 
-# Executar todas as coleções de uma vez com um único relatório
-Write-Host "`nExecutando todas as coleções..." -ForegroundColor Green
+# Run all collections with a single report
+Write-Host "`nRunning all collections..." -ForegroundColor Green
 
-# Executar cada coleção individualmente e combinar os resultados
+# Run each collection individually and combine results
 foreach ($collection in $collections) {
-    Write-Host "`nExecutando coleção: $collection`n"
+    Write-Host "`nRunning collection: $collection`n"
     newman run $collection -r cli
 }
 
-# Remover arquivo temporário
+# Remove temporary file
 Remove-Item $collectionsList
 
 Write-Host "`n===============================================" -ForegroundColor Green
-Write-Host "Todos os testes foram executados!" -ForegroundColor Green
-Write-Host "Relatório combinado disponível em: $reportDir/combined-report.html" -ForegroundColor Yellow
+Write-Host "All tests have been executed!" -ForegroundColor Green
+Write-Host "Combined report available at: $reportDir/combined-report.html" -ForegroundColor Yellow
 Write-Host "===============================================" -ForegroundColor Green 
