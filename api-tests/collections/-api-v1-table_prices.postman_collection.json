@@ -1,0 +1,271 @@
+{
+	"info": {
+		"_postman_id": "57851ba4-1b15-414d-b48e-97a69cb1c65a",
+		"name": "/api/v1/table_prices",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37354928"
+	},
+	"item": [
+		{
+			"name": "Listar todas as tabelas de preço - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// GET - Listar todas as tabelas de preço\r",
+							"pm.test(\"Status 200 OK - Listar Tabelas de Preço\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/table_prices",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"table_prices"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Criar uma nova tabela de preço - 201 Created",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 201 Created - Criar Tabela de Preço\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Salvar ID da Tabela de Preço Criada\", function () {\r",
+							"    let responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson).to.have.property(\"id\");\r",
+							"    let newTablePriceID = responseJson.id;\r",
+							"pm.environment.set(\"tablePriceID\", newTablePriceID);\r",
+							"console.log(\"Novo tablePriceID salvo: \" + newTablePriceID);\r",
+							"    console.log(\"Novo tablePriceID criado: \" + responseJson.id);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Tabela Premium\",\r\n  \"type\": \"SPECIALTY\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/table_prices",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"table_prices"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obter uma Tabela de preço por ID - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (!pm.environment.get(\"tablePriceID\")) {\r",
+							"    console.log(\"tablePriceID não setado. Execute o POST para criar uma nova tabela de preço.\");\r",
+							"    console.log(\"Usando tablePriceID: \" + pm.environment.get(\"tablePriceID\"));\r",
+							"}\r",
+							"\r",
+							"pm.test(\"Status 200 OK - Obter Tabela de Preço pelo ID\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/table_prices/{{tablePriceID}}",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"table_prices",
+						"{{tablePriceID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Atualizar uma tabela de preços existente - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (!pm.environment.get(\"tablePriceID\")) {\r",
+							"    console.log(\"tablePriceID não setado. Execute o POST para criar uma nova tabela de preço.\");\r",
+							"    console.log(\"Usando tablePriceID: \" + pm.environment.get(\"tablePriceID\"));\r",
+							"}\r",
+							"\r",
+							"pm.test(\"Status 200 OK - Atualizar Tabela de Preço pelo ID\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Tabela Básica atualizada\",\r\n  \"type\": \"EXAMS\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/table_prices/{{tablePriceID}}",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"table_prices",
+						"{{tablePriceID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deletar uma tabela de preços  - 204 No Content",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (!pm.environment.get(\"tablePriceID\")) {\r",
+							"    console.log(\"tablePriceID não setado. Execute o POST para criar uma nova tabela de preço.\");\r",
+							"    console.log(\"Usando tablePriceID: \" + pm.environment.get(\"tablePriceID\"));\r",
+							"}\r",
+							"\r",
+							"pm.test(\"Status 204 No Content - Excluir Tabela de Preço pelo ID\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(204);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/table_prices/{{tablePriceID}}",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"table_prices",
+						"{{tablePriceID}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

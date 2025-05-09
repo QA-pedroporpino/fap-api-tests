@@ -1,0 +1,287 @@
+{
+	"info": {
+		"_postman_id": "47e15c2b-1cf8-4873-874e-6c92c1179913",
+		"name": "/api/v1/speciality_prices",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37354928"
+	},
+	"item": [
+		{
+			"name": "Lista da managers  - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verificar se o status é 200 OK\r",
+							"pm.test(\"Status 200 OK\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"// Verificar se a resposta é um objeto\r",
+							"pm.test(\"Resposta é um objeto\", function () {\r",
+							"    let responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson).to.be.an(\"object\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/specialty_prices",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"specialty_prices"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Criar novo preço de especialidade - 201 Created",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verificar status 201 Created\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Salvar ID do specialty price criado\", function () {\r",
+							"    let responseJson = pm.response.json();\r",
+							"    \r",
+							"    // Verificar se o ID foi gerado\r",
+							"    pm.expect(responseJson).to.have.property(\"id\");\r",
+							"\r",
+							"    // Salvar o ID em uma variável\r",
+							"    pm.environment.set(\"specialtyPriceID\", responseJson.id);\r",
+							"    console.log(\"Novo specialty price ID criado para deleção: \" + responseJson.id);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"table_price_id\": 1,\r\n  \"specialty_id\": 1,\r\n  \"title\": \"Consulta com Especialista\",\r\n  \"sla\": 72,\r\n  \"price\": 350\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/specialty_prices",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"specialty_prices"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obter preço de especialidade por ID - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 200 OK\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"// Garantir que o specialtyPriceID esteja salvo\r",
+							"let responseJson = pm.response.json();\r",
+							"if (responseJson.id) {\r",
+							"    pm.environment.set(\"specialtyPriceID\", responseJson.id);\r",
+							"    console.log(\"Specialty Price ID atualizado: \" + responseJson.id);\r",
+							"} else {\r",
+							"    console.log(\"Specialty Price ID não encontrado no response.\");\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/specialty_prices/{{specialtyPriceID}}",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"specialty_prices",
+						"{{specialtyPriceID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Atualizar um Manager - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (!pm.environment.get(\"specialtyPriceID\")) {\r",
+							"    console.log(\"specialtyPriceID não setado. Execute o POST para criar um novo specialty price.\");\r",
+							"    postman.setNextRequest(null); // Cancela o PUT se o specialtyPriceID não existir\r",
+							"} else {\r",
+							"    console.log(\"Atualizando specialty price com ID: \" + pm.environment.get(\"specialtyPriceID\"));\r",
+							"}\r",
+							"\r",
+							"pm.test(\"Verificar status 200 OK\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"table_price_id\": 1,\r\n  \"specialty_id\": 1,\r\n  \"title\": \"Consulta com Especialista atualizada\",\r\n  \"sla\": 72,\r\n  \"price\": 350\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/specialty_prices/{{specialtyPriceID}}",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"specialty_prices",
+						"{{specialtyPriceID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deletar um Manager - 204 No Content",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (!pm.environment.get(\"specialtyPriceID\")) {\r",
+							"    console.log(\"specialtyPriceID não setado. Execute o POST para criar um novo specialty price.\");\r",
+							"    postman.setNextRequest(null); // Cancela o PUT se o specialtyPriceID não existir\r",
+							"} else {\r",
+							"    console.log(\"Atualizando specialty price com ID: \" + pm.environment.get(\"specialtyPriceID\"));\r",
+							"}\r",
+							"\r",
+							"pm.test(\"Verificar status 204 No Content\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(204);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/specialty_prices/{{specialtyPriceID}}\n",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"specialty_prices",
+						"{{specialtyPriceID}}\n"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

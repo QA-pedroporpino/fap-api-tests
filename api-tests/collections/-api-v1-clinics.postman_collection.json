@@ -1,0 +1,285 @@
+{
+	"info": {
+		"_postman_id": "035dbbea-003e-4207-941b-bf14e79fe4a7",
+		"name": "/api/v1/clinics",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37354928"
+	},
+	"item": [
+		{
+			"name": "Listar todas as clínicas - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verificar se o status é 200 OK\r",
+							"pm.test(\"Status 200 OK\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"// Verificar se a resposta é um objeto\r",
+							"pm.test(\"Resposta é um objeto\", function () {\r",
+							"    let responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson).to.be.an(\"object\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clinics",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"clinics"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Criar uma nova clínica - 201 Created",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verificar status 201 Created\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Salvar ID da clínica criada\", function () {\r",
+							"    let responseJson = pm.response.json();\r",
+							"\r",
+							"    // Verificar se o ID foi gerado\r",
+							"    pm.expect(responseJson).to.have.property(\"id\");\r",
+							"\r",
+							"    // Salvar o ID em uma variável\r",
+							"    pm.environment.set(\"clinicID\", responseJson.id);\r",
+							"    console.log(\"Novo clinic ID criado: \" + responseJson.id);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Clinica X\",\r\n  \"profile\": \"manager\",\r\n  \"preferred_network\": true,\r\n  \"clinic_services_relation\": [\r\n    {\r\n      \"title\": \"Atendimento Geral\"\r\n    }\r\n  ],\r\n  \"clinic_service_times_relation\": [\r\n    {\r\n      \"start_time\": \"08:00:00\",\r\n      \"end_time\": \"18:00:00\",\r\n      \"days\": \"Seg-Sex\"\r\n    }\r\n  ],\r\n  \"clinic_offices_relation\": [\r\n    {\r\n      \"contact_email\": \"office@clinic.com\",\r\n      \"contect_cellphone\": \"111222333\",\r\n      \"contact_phone\": \"444555666\",\r\n      \"address_relation\": {\r\n        \"zip_code\": \"01001-000\",\r\n        \"street\": \"Rua A\",\r\n        \"number\": \"100\",\r\n        \"state\": \"SP\",\r\n        \"city\": \"São Paulo\"\r\n      }\r\n    }\r\n  ],\r\n  \"clinic_main_professionals_relation\": [\r\n    {\r\n      \"name\": \"Dr. Fulano\",\r\n      \"cpf\": \"00011122233\",\r\n      \"crm\": \"CRM1234\",\r\n      \"state\": \"SP\",\r\n      \"cellphone\": \"999888777\",\r\n      \"email\": \"dr@clinic.com\"\r\n    }\r\n  ],\r\n  \"clinic_languages_relation\": [\r\n    {\r\n      \"title\": \"Português\"\r\n    }\r\n  ],\r\n  \"clinic_infos_relation\": [\r\n    {\r\n      \"contact_email\": \"info@clinic.com\",\r\n      \"contact_phone\": \"555666777\",\r\n      \"contact_cellphone\": \"888999000\",\r\n      \"address_relation\": {\r\n        \"zip_code\": \"01002-000\",\r\n        \"street\": \"Rua B\",\r\n        \"number\": \"200\",\r\n        \"state\": \"SP\",\r\n        \"city\": \"São Paulo\"\r\n      }\r\n    }\r\n  ],\r\n  \"clinic_documents_relation\": [\r\n    {\r\n      \"document_type\": \"CNES\",\r\n      \"end_date\": \"2023-01-01\",\r\n      \"url\": \"http://...\",\r\n      \"filename\": \"doc.pdf\"\r\n    }\r\n  ],\r\n  \"clinic_classifications_relation\": [\r\n    {\r\n      \"title\": \"Classe A\"\r\n    }\r\n  ],\r\n  \"clinic_billings_relation\": [\r\n    {\r\n      \"payment_type\": \"BOLETO\",\r\n      \"account_holder\": \"Clinica X\",\r\n      \"bank\": \"Banco Y\",\r\n      \"agency\": \"0001\",\r\n      \"contact_name\": \"Financeiro\",\r\n      \"contact_email\": \"fin@clinic.com\",\r\n      \"contact_cellphone\": \"222333444\",\r\n      \"contact_phone\": \"333444555\"\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clinics",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"clinics"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obter uma Clínica por ID - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 200 OK\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"// Garantir que o clinicID esteja salvo\r",
+							"let responseJson = pm.response.json();\r",
+							"if (responseJson.id) {\r",
+							"    pm.environment.set(\"clinicID\", responseJson.id);\r",
+							"    console.log(\"Clinic ID atualizado: \" + responseJson.id);\r",
+							"} else {\r",
+							"    console.log(\"Clinic ID não encontrado no response.\");\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clinics/{{clinicID}}",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"clinics",
+						"{{clinicID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Atualizar uma clínica existente - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (!pm.environment.get(\"clinicID\")) {\r",
+							"    console.log(\"clinicID não setado. Execute o POST para criar uma nova clínica.\");\r",
+							"    postman.setNextRequest(null); // Cancela o PUT se o clinicID não existir\r",
+							"} else {\r",
+							"    console.log(\"Profile ID não encontrado no response.\");\r",
+							"}\r",
+							"\r",
+							"pm.test(\"Verificar status 200 OK\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Clinica X Atualizada\",\r\n  \"profile\": \"specialist\",\r\n  \"preferred_network\": false,\r\n  \"clinic_services_relation\": [\r\n    {\r\n      \"title\": \"Atendimento Avançado\"\r\n    }\r\n  ],\r\n  \"clinic_service_times_relation\": [\r\n    {\r\n      \"start_time\": \"09:00:00\",\r\n      \"end_time\": \"19:00:00\",\r\n      \"days\": \"Seg-Sab\"\r\n    }\r\n  ],\r\n  \"clinic_offices_relation\": [\r\n    {\r\n      \"contact_email\": \"newoffice@clinic.com\",\r\n      \"contect_cellphone\": \"333444555\",\r\n      \"contact_phone\": \"777888999\",\r\n      \"address_relation\": {\r\n        \"zip_code\": \"02003-000\",\r\n        \"street\": \"Rua C\",\r\n        \"number\": \"300\",\r\n        \"state\": \"RJ\",\r\n        \"city\": \"Rio de Janeiro\"\r\n      }\r\n    }\r\n  ],\r\n  \"clinic_main_professionals_relation\": [\r\n    {\r\n      \"name\": \"Dr. Ciclano\",\r\n      \"cpf\": \"11122233344\",\r\n      \"crm\": \"CRM5678\",\r\n      \"state\": \"RJ\",\r\n      \"cellphone\": \"666555444\",\r\n      \"email\": \"drciclano@clinic.com\"\r\n    }\r\n  ],\r\n  \"clinic_languages_relation\": [\r\n    {\r\n      \"title\": \"Inglês\"\r\n    }\r\n  ],\r\n  \"clinic_infos_relation\": [\r\n    {\r\n      \"contact_email\": \"info_updated@clinic.com\",\r\n      \"contact_phone\": \"666777888\",\r\n      \"contact_cellphone\": \"999000111\",\r\n      \"address_relation\": {\r\n        \"zip_code\": \"02004-000\",\r\n        \"street\": \"Rua D\",\r\n        \"number\": \"400\",\r\n        \"state\": \"RJ\",\r\n        \"city\": \"Rio de Janeiro\"\r\n      }\r\n    }\r\n  ],\r\n  \"clinic_documents_relation\": [\r\n    {\r\n      \"document_type\": \"CNES\",\r\n      \"end_date\": \"2024-12-31\",\r\n      \"url\": \"http://new-url.com\",\r\n      \"filename\": \"new_doc.pdf\"\r\n    }\r\n  ],\r\n  \"clinic_classifications_relation\": [\r\n    {\r\n      \"title\": \"Classe B\"\r\n    }\r\n  ],\r\n  \"clinic_billings_relation\": [\r\n    {\r\n      \"payment_type\": \"PIX\",\r\n      \"account_holder\": \"Clinica X Atualizada\",\r\n      \"bank\": \"Banco Z\",\r\n      \"agency\": \"0002\",\r\n      \"contact_name\": \"Novo Financeiro\",\r\n      \"contact_email\": \"financeiro@clinic.com\",\r\n      \"contact_cellphone\": \"888999000\",\r\n      \"contact_phone\": \"111222333\"\r\n    }\r\n  ]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clinics/{{clinicID}}\n",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"clinics",
+						"{{clinicID}}\n"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deletar uma Clínica  - 204 No Content",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (!pm.environment.get(\"clinicID\")) {\r",
+							"    console.log(\"clinicID não setado. Execute o POST para criar uma nova clínica.\");\r",
+							"    postman.setNextRequest(null); // Cancela o DELETE se o clinicID não existir\r",
+							"}\r",
+							"\r",
+							"pm.test(\"Verificar status 204 No Content\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(204);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clinics/{{clinicID}}\n",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"clinics",
+						"{{clinicID}}\n"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
