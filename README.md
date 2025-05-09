@@ -48,12 +48,16 @@ npm install -g newman newman-reporter-htmlextra
 
 2. Execute os testes:
 ```bash
-# Executar todos os testes
-.\run-tests.ps1
+# Executar todos os testes de uma vez
+.\run-all-tests.ps1
 
 # Ou executar coleções individualmente
 newman run api-tests/collections/-api-v1-managers.postman_collection.json
 newman run api-tests/collections/-api-v1-profiles.postman_collection.json
+newman run api-tests/collections/-api-v1-clinics.postman_collection.json
+newman run api-tests/collections/-api-v1-specialties.postman_collection.json
+newman run api-tests/collections/-api-v1-speciality_prices.postman_collection.json
+newman run api-tests/collections/-api-v1-table_prices.postman_collection.json
 ```
 
 ## GitHub Actions
