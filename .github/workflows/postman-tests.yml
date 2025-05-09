@@ -1,0 +1,66 @@
+name: Postman API Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: # Permite execução manual
+
+env:
+  # Variáveis que podem ser configuradas pelo tech lead
+  NEWMAN_ENVIRONMENT: 'qa' # Ambiente a ser usado (qa, staging, prod)
+  NEWMAN_COLLECTIONS: 'api-tests/collections/*.postman_collection.json' # Padrão para encontrar as coleções
+  NEWMAN_REPORTS_DIR: 'api-tests/reports' # Diretório para os relatórios
+  NEWMAN_TIMEOUT: '300000' # Timeout em ms (5 minutos)
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install Newman and reporters
+      run: |
+        npm install -g newman
+        npm install -g newman-reporter-htmlextra
+        npm install -g newman-reporter-cli
+    
+    - name: Create reports directory
+      run: mkdir -p ${{ env.NEWMAN_REPORTS_DIR }}
+    
+    - name: Run Postman Collections
+      run: |
+        # Executa cada coleção individualmente
+        for collection in ${{ env.NEWMAN_COLLECTIONS }}; do
+          echo "Running collection: $collection"
+          newman run "$collection" \
+            -e "api-tests/environments/${{ env.NEWMAN_ENVIRONMENT }}.postman_environment.json" \
+            -r cli,htmlextra \
+            --reporter-htmlextra-export "${{ env.NEWMAN_REPORTS_DIR }}/$(basename "$collection" .postman_collection.json)-report.html" \
+            --reporter-htmlextra-title "API Tests Report - $(basename "$collection")" \
+            --reporter-htmlextra-darkTheme \
+            --reporter-htmlextra-showOnlyFails \
+            --timeout ${{ env.NEWMAN_TIMEOUT }}
+        done
+    
+    - name: Upload test reports
+      uses: actions/upload-artifact@v3
+      if: always() # Sempre faz upload, mesmo se os testes falharem
+      with:
+        name: postman-test-reports
+        path: ${{ env.NEWMAN_REPORTS_DIR }}
+        retention-days: 7
+    
+    - name: Notify on failure
+      if: failure()
+      run: |
+        echo "::error::Some Postman tests failed. Check the reports for details."
+        # Aqui o tech lead pode adicionar notificações (Slack, email, etc) 
