@@ -1,0 +1,44 @@
+name: API Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Install Newman
+      run: npm install -g newman newman-reporter-htmlextra
+      
+    - name: Run Managers Tests
+      run: |
+        newman run api-tests/collections/-api-v1-managers.postman_collection.json \
+          -r htmlextra \
+          --reporter-htmlextra-export api-tests/reports/managers-report.html \
+          --reporter-htmlextra-title "Managers API Test Report"
+          
+    - name: Run Profiles Tests
+      run: |
+        newman run api-tests/collections/-api-v1-profiles.postman_collection.json \
+          -r htmlextra \
+          --reporter-htmlextra-export api-tests/reports/profiles-report.html \
+          --reporter-htmlextra-title "Profiles API Test Report"
+          
+    - name: Upload Test Reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: api-test-reports
+        path: api-tests/reports/
+        retention-days: 30 

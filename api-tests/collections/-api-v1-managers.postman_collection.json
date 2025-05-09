@@ -1,0 +1,290 @@
+{
+	"info": {
+		"_postman_id": "91936158-3a91-4c8c-a22b-c02a50661dea",
+		"name": "/api/v1/managers",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37354928"
+	},
+	"item": [
+		{
+			"name": "Lista da managers",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verificar se o status é 200 OK\r",
+							"pm.test(\"Status 200 OK\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"// Verificar se a resposta é um objeto\r",
+							"pm.test(\"Resposta é um objeto\", function () {\r",
+							"    let responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson).to.be.an(\"object\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/managers",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"managers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Criar manager",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verificar status 201 Created\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Salvar ID do manager criado\", function () {\r",
+							"    let responseJson = pm.response.json();\r",
+							"    \r",
+							"    // Verificar se o ID foi gerado\r",
+							"    pm.expect(responseJson).to.have.property(\"id\");\r",
+							"\r",
+							"    // Salvar o ID em uma variável\r",
+							"    pm.environment.set(\"profileID\", responseJson.id);\r",
+							"    console.log(\"Novo profile ID criado para deleção: \" + responseJson.id);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Fulano\",\r\n  \"email\": \"novo.manager@example.com\",\r\n  \"document_type\": \"CPF\",\r\n  \"document\": \"98765432100\",\r\n  \"social_name\": \"Manager Social\",\r\n  \"phone\": \"11988888888\",\r\n  \"active\": true,\r\n  \"profile_id\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/managers",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"managers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buscar um manager por ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 200 OK\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"// Garantir que o profileID esteja salvo\r",
+							"let responseJson = pm.response.json();\r",
+							"if (responseJson.id) {\r",
+							"    pm.environment.set(\"profileID\", responseJson.id);\r",
+							"    console.log(\"Profile ID atualizado: \" + responseJson.id);\r",
+							"} else {\r",
+							"    console.log(\"Profile ID não encontrado no response.\");\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/managers/{{profileID}}",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"managers",
+						"{{profileID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Atualizar um Manager",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 200 OK\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"// Garantir que o profileID esteja salvo\r",
+							"let responseJson = pm.response.json();\r",
+							"if (responseJson.id) {\r",
+							"    pm.environment.set(\"profileID\", responseJson.id);\r",
+							"    console.log(\"Profile ID atualizado: \" + responseJson.id);\r",
+							"} else {\r",
+							"    console.log(\"Profile ID não encontrado no response.\");\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Fulano Atualizado\",\r\n  \"email\": \"atualizado@example.com\",\r\n  \"document_type\": \"CPF\",\r\n  \"document\": \"12345678900\",\r\n  \"social_name\": \"Fulano Social\",\r\n  \"phone\": \"11977777777\",\r\n  \"active\": false,\r\n  \"profile_id\": 1\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/managers/{{profileID}}\n",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"managers",
+						"{{profileID}}\n"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deletar um Manager",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (!pm.environment.get(\"profileID\")) {\r",
+							"    console.log(\"profileID não setado. Execute o POST para criar um novo manager.\");\r",
+							"    postman.setNextRequest(null);  // Cancela o DELETE se o profileID não existir\r",
+							"}\r",
+							"\r",
+							"pm.test(\"Verificar status 204 No Content\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(204);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/managers/{{profileID}}\n",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"managers",
+						"{{profileID}}\n"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
