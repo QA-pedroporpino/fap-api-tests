@@ -1,82 +1,96 @@
-# API Tests
+# FAP API Tests
 
-Este repositório contém testes automatizados para as APIs do FAP Clinic.
+Este repositório contém testes automatizados para as APIs do sistema FAP, utilizando Postman e Newman para execução.
 
 ## Estrutura do Projeto
 
 ```
 .
-├── api-tests/
-│   ├── collections/     # Coleções do Postman
-│   ├── environments/    # Ambientes do Postman
-│   └── reports/         # Relatórios de teste
 ├── .github/
-│   └── workflows/       # Configurações do GitHub Actions
-└── README.md
+│   └── workflows/
+│       └── api-tests.yml
+├── api-tests/
+│   ├── collections/
+│   │   ├── -api-v1-clinics.postman_collection.json
+│   │   ├── -api-v1-managers.postman_collection.json
+│   │   ├── -api-v1-profiles.postman_collection.json
+│   │   ├── -api-v1-speciality_prices.postman_collection.json
+│   │   ├── -api-v1-specialties.postman_collection.json
+│   │   └── -api-v1-table_prices.postman_collection.json
+│   └── reports/
+└── run-all-tests.ps1
 ```
 
-## Coleções de Teste
+## Pré-requisitos
 
-- **Managers API**: Testes para o endpoint `/api/v1/managers`
-- **Profiles API**: Testes para o endpoint `/api/v1/profiles`
-- **Clinics API**: Testes para o endpoint `/api/v1/clinics`
-- **Specialties API**: Testes para o endpoint `/api/v1/specialties`
-- **Speciality Prices API**: Testes para o endpoint `/api/v1/speciality_prices`
-- **Table Prices API**: Testes para o endpoint `/api/v1/table_prices`
-- **Exams API**: Testes para o endpoint `/api/v1/exams`
-- **Certificates API**: Testes para o endpoint `/api/v1/certificates`
-- **Professionals API**: Testes para o endpoint `/api/v1/professionals`
+- Node.js 18 ou superior
+- npm (Node Package Manager)
+- Newman CLI
+- PowerShell (para execução local)
 
-## Ambientes
+## Instalação
 
-A pasta `environments` contém os arquivos de ambiente do Postman que definem as variáveis utilizadas nos testes. Cada ambiente pode conter diferentes configurações para:
-
-- URLs base
-- Tokens de autenticação
-- Credenciais
-- Outras variáveis específicas do ambiente
-
-Para executar os testes com um ambiente específico, use o parâmetro `-e`:
-
+1. Clone o repositório:
 ```bash
-newman run api-tests/collections/-api-v1-managers.postman_collection.json -e api-tests/environments/seu-ambiente.postman_environment.json
+git clone https://github.com/QA-pedroporpino/fap-api-tests.git
+cd fap-api-tests
 ```
 
-## Executando os Testes Localmente
-
-1. Instale o Newman globalmente:
+2. Instale as dependências:
 ```bash
 npm install -g newman newman-reporter-htmlextra
 ```
 
-2. Execute os testes:
-```bash
-# Executar todos os testes de uma vez
-.\run-all-tests.ps1
+## Executando os Testes
 
-# Ou executar coleções individualmente
-newman run api-tests/collections/-api-v1-managers.postman_collection.json
-newman run api-tests/collections/-api-v1-profiles.postman_collection.json
-newman run api-tests/collections/-api-v1-clinics.postman_collection.json
-newman run api-tests/collections/-api-v1-specialties.postman_collection.json
-newman run api-tests/collections/-api-v1-speciality_prices.postman_collection.json
-newman run api-tests/collections/-api-v1-table_prices.postman_collection.json
+### Localmente
+
+Para executar todos os testes localmente, use o script PowerShell:
+
+```powershell
+.\run-all-tests.ps1
 ```
 
-## GitHub Actions
+Este script irá:
+- Executar todas as coleções de testes
+- Gerar relatórios HTML individuais para cada coleção
+- Salvar os relatórios em `api-tests/reports/`
+
+### No GitHub Actions
 
 Os testes são executados automaticamente:
 - Em cada push para a branch `main`
-- Em cada Pull Request para a branch `main`
-- Manualmente através do botão "Run workflow" no GitHub Actions
+- Em cada pull request para a branch `main`
+- Manualmente através do workflow dispatch
 
-Os relatórios de teste são gerados como artifacts e podem ser baixados da página de Actions do GitHub.
+O workflow irá:
+1. Configurar o ambiente Node.js
+2. Instalar as dependências necessárias
+3. Executar todas as coleções de testes
+4. Gerar relatórios HTML para cada coleção
+5. Fazer upload dos relatórios como artefatos do GitHub Actions
 
-## Relatórios
+Os relatórios podem ser baixados na aba "Artifacts" de cada execução do workflow.
 
-Os relatórios HTML são gerados após cada execução dos testes e incluem:
-- Status de cada requisição
-- Tempo de resposta
-- Resultados dos testes
-- Dados enviados e recebidos
-- Gráficos e estatísticas 
+## Coleções de Testes
+
+O projeto inclui as seguintes coleções de testes:
+
+- Clinics API Tests
+- Managers API Tests
+- Profiles API Tests
+- Speciality Prices API Tests
+- Specialties API Tests
+- Table Prices API Tests
+
+## Contribuindo
+
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -m 'feat: adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
+
+## Licença
+
+Este projeto está sob a licença MIT. 
