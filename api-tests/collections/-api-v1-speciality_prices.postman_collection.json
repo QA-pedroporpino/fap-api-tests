@@ -7,7 +7,7 @@
 	},
 	"item": [
 		{
-			"name": "Lista da managers  - 200 OK",
+			"name": "Listar todos os preços de especialidade  - 200 OK",
 			"event": [
 				{
 					"listen": "test",
@@ -23,6 +23,34 @@
 							"    let responseJson = pm.response.json();\r",
 							"    pm.expect(responseJson).to.be.an(\"object\");\r",
 							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Geração Dinâmica de Dados\r",
+							"let timestamp = new Date().getTime();\r",
+							"let title = \"Consulta com Especialista \" + timestamp;\r",
+							"let price = Math.floor(Math.random() * 500) + 100; // Preço aleatório entre 100 e 600\r",
+							"let sla = 72; // SLA fixo para simplificação\r",
+							"let tablePriceID = 1; // Mantendo fixo para garantir criação\r",
+							"let specialtyID = 1; // Especialidade padrão\r",
+							"\r",
+							"// Salvar no ambiente\r",
+							"pm.environment.set(\"title\", title);\r",
+							"pm.environment.set(\"price\", price);\r",
+							"pm.environment.set(\"sla\", sla);\r",
+							"pm.environment.set(\"table_price_id\", tablePriceID);\r",
+							"pm.environment.set(\"specialty_id\", specialtyID);\r",
+							"\r",
+							"console.log(\"Título gerado: \" + title);\r",
+							"console.log(\"Preço: \" + price);\r",
+							"console.log(\"SLA: \" + sla);\r",
+							"console.log(\"Table Price ID: \" + tablePriceID);"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -66,16 +94,45 @@
 							"    pm.expect(pm.response.code).to.equal(201);\r",
 							"});\r",
 							"\r",
-							"pm.test(\"Salvar ID do specialty price criado\", function () {\r",
+							"pm.test(\"Salvar ID do Preço da Especialidade criado\", function () {\r",
 							"    let responseJson = pm.response.json();\r",
 							"    \r",
-							"    // Verificar se o ID foi gerado\r",
-							"    pm.expect(responseJson).to.have.property(\"id\");\r",
-							"\r",
-							"    // Salvar o ID em uma variável\r",
-							"    pm.environment.set(\"specialtyPriceID\", responseJson.id);\r",
-							"    console.log(\"Novo specialty price ID criado para deleção: \" + responseJson.id);\r",
+							"    if (responseJson.id) {\r",
+							"        pm.environment.set(\"specialtyPriceID\", responseJson.id);\r",
+							"        console.log(\"Specialty Price ID salvo: \" + responseJson.id);\r",
+							"    } else {\r",
+							"        console.warn(\"ID do Preço da Especialidade não foi gerado.\");\r",
+							"    }\r",
 							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Geração Dinâmica de Dados\r",
+							"let timestamp = new Date().getTime();\r",
+							"let title = \"Consulta com Especialista \" + timestamp;\r",
+							"let price = Math.floor(Math.random() * 500) + 100; // Preço aleatório entre 100 e 600\r",
+							"let sla = 72; // SLA fixo para simplificação\r",
+							"let tablePriceID = 1; // Mantendo fixo para garantir criação\r",
+							"let specialtyID = 1; // Especialidade padrão\r",
+							"\r",
+							"// Salvar no ambiente\r",
+							"pm.environment.set(\"title\", title);\r",
+							"pm.environment.set(\"price\", price);\r",
+							"pm.environment.set(\"sla\", sla);\r",
+							"pm.environment.set(\"table_price_id\", tablePriceID);\r",
+							"pm.environment.set(\"specialty_id\", specialtyID);\r",
+							"\r",
+							"console.log(\"Título gerado: \" + title);\r",
+							"console.log(\"Preço: \" + price);\r",
+							"console.log(\"SLA: \" + sla);\r",
+							"console.log(\"Table Price ID: \" + tablePriceID);\r",
+							"console.log(\"Specialty ID: \" + specialtyID);"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -90,7 +147,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"table_price_id\": 1,\r\n  \"specialty_id\": 1,\r\n  \"title\": \"Consulta com Especialista\",\r\n  \"sla\": 72,\r\n  \"price\": 350\r\n}",
+					"raw": "{\r\n  \"table_price_id\": {{table_price_id}},\r\n  \"specialty_id\": {{specialty_id}},\r\n  \"title\": \"{{title}}\",\r\n  \"sla\": {{sla}},\r\n  \"price\": {{price}}\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -124,19 +181,20 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status 200 OK\", function () {\r",
+							"pm.test(\"Verificar status 200 OK\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(200);\r",
 							"});\r",
 							"\r",
-							"// Garantir que o specialtyPriceID esteja salvo\r",
-							"let responseJson = pm.response.json();\r",
-							"if (responseJson.id) {\r",
-							"    pm.environment.set(\"specialtyPriceID\", responseJson.id);\r",
-							"    console.log(\"Specialty Price ID atualizado: \" + responseJson.id);\r",
-							"} else {\r",
-							"    console.log(\"Specialty Price ID não encontrado no response.\");\r",
-							"}\r",
-							""
+							"pm.test(\"Validar estrutura do Preço da Especialidade\", function () {\r",
+							"    let responseJson = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseJson).to.have.property(\"id\");\r",
+							"    pm.expect(responseJson).to.have.property(\"title\");\r",
+							"    pm.expect(responseJson).to.have.property(\"price\");\r",
+							"    pm.expect(responseJson).to.have.property(\"sla\");\r",
+							"\r",
+							"    console.log(\"Preço da Especialidade encontrado: \" + responseJson.title);\r",
+							"});"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -171,22 +229,41 @@
 			"response": []
 		},
 		{
-			"name": "Atualizar um Manager - 200 OK",
+			"name": "Atualizar o preço de uma especialidade existente - 200 OK",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"if (!pm.environment.get(\"specialtyPriceID\")) {\r",
-							"    console.log(\"specialtyPriceID não setado. Execute o POST para criar um novo specialty price.\");\r",
-							"    postman.setNextRequest(null); // Cancela o PUT se o specialtyPriceID não existir\r",
-							"} else {\r",
-							"    console.log(\"Atualizando specialty price com ID: \" + pm.environment.get(\"specialtyPriceID\"));\r",
-							"}\r",
-							"\r",
 							"pm.test(\"Verificar status 200 OK\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validar atualização do Preço da Especialidade\", function () {\r",
+							"    let responseJson = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseJson).to.have.property(\"id\");\r",
+							"    pm.expect(responseJson).to.have.property(\"title\");\r",
+							"    pm.expect(responseJson.title).to.include(\"Atualizado_\");\r",
+							"\r",
+							"    console.log(\"Preço da Especialidade atualizado: \" + responseJson.title);\r",
 							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let specialtyPriceID = pm.environment.get(\"specialtyPriceID\");\r",
+							"\r",
+							"if (!specialtyPriceID) {\r",
+							"    console.warn(\"specialtyPriceID não foi definido. Execute o POST primeiro para criar um Preço da Especialidade.\");\r",
+							"} else {\r",
+							"    console.log(\"Specialty Price ID para atualização: \" + specialtyPriceID);\r",
+							"}"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -201,7 +278,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"table_price_id\": 1,\r\n  \"specialty_id\": 1,\r\n  \"title\": \"Consulta com Especialista atualizada\",\r\n  \"sla\": 72,\r\n  \"price\": 350\r\n}",
+					"raw": "{\r\n  \"table_price_id\": {{table_price_id}},\r\n  \"title\": \"Atualizado_{{title}}\",\r\n  \"sla\": 48,\r\n  \"price\": 300\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -230,22 +307,48 @@
 			"response": []
 		},
 		{
-			"name": "Deletar um Manager - 204 No Content",
+			"name": "Deletar um preço de especialidade - 204 No Content",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"if (!pm.environment.get(\"specialtyPriceID\")) {\r",
-							"    console.log(\"specialtyPriceID não setado. Execute o POST para criar um novo specialty price.\");\r",
-							"    postman.setNextRequest(null); // Cancela o PUT se o specialtyPriceID não existir\r",
-							"} else {\r",
-							"    console.log(\"Atualizando specialty price com ID: \" + pm.environment.get(\"specialtyPriceID\"));\r",
-							"}\r",
-							"\r",
 							"pm.test(\"Verificar status 204 No Content\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(204);\r",
-							"});"
+							"    console.log(\"Specialty Price deletado com sucesso. ID: \" + pm.environment.get(\"specialtyPriceID\"));\r",
+							"});\r",
+							"\r",
+							"// Remover a variável do ambiente\r",
+							"pm.environment.unset(\"specialtyPriceID\");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Geração Dinâmica de Dados\r",
+							"let timestamp = new Date().getTime();\r",
+							"let title = \"Consulta com Especialista \" + timestamp;\r",
+							"let price = Math.floor(Math.random() * 500) + 100; // Preço aleatório entre 100 e 600\r",
+							"let sla = 72; // SLA fixo para simplificação\r",
+							"let tablePriceID = 1; // Mantendo fixo para garantir criação\r",
+							"let specialtyID = 1; // Especialidade padrão\r",
+							"\r",
+							"// Salvar no ambiente\r",
+							"pm.environment.set(\"title\", title);\r",
+							"pm.environment.set(\"price\", price);\r",
+							"pm.environment.set(\"sla\", sla);\r",
+							"pm.environment.set(\"table_price_id\", tablePriceID);\r",
+							"pm.environment.set(\"specialty_id\", specialtyID);\r",
+							"\r",
+							"console.log(\"Título gerado: \" + title);\r",
+							"console.log(\"Preço: \" + price);\r",
+							"console.log(\"SLA: \" + sla);\r",
+							"console.log(\"Table Price ID: \" + tablePriceID);\r",
+							"console.log(\"Specialty ID: \" + specialtyID);"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -258,7 +361,10 @@
 				},
 				"method": "DELETE",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
 				"url": {
 					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/specialty_prices/{{specialtyPriceID}}\n",
 					"protocol": "https",

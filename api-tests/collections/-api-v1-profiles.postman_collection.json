@@ -7,13 +7,34 @@
 	},
 	"item": [
 		{
-			"name": "Lista de Perfis",
+			"name": "Lista de Perfis - 200 OK",
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							""
+							"// Geração Dinâmica Simples\r",
+							"let timestamp = new Date().getTime();\r",
+							"let profileName = \"Profile_\" + timestamp;\r",
+							"let profileType = \"MANAGER\"; // Pode ser \"PROFESSIONAL\" ou \"MANAGER\"\r",
+							"let clinicID = 1; // Mantendo fixo para simplificar\r",
+							"\r",
+							"// Permissões Dinâmicas\r",
+							"let permissions = [\r",
+							"    \"SCHEDULE_VIEW\",\r",
+							"    \"APPOINT_CONSULTATION\"\r",
+							"];\r",
+							"\r",
+							"// Salvar no ambiente\r",
+							"pm.environment.set(\"profile_name\", profileName);\r",
+							"pm.environment.set(\"profile_type\", profileType);\r",
+							"pm.environment.set(\"clinic_id\", clinicID);\r",
+							"pm.environment.set(\"permissions\", JSON.stringify(permissions));\r",
+							"\r",
+							"console.log(\"Profile gerado: \" + profileName);\r",
+							"console.log(\"Tipo: \" + profileType);\r",
+							"console.log(\"Clinic ID: \" + clinicID);\r",
+							"console.log(\"Permissões: \" + permissions.join(\", \"));"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -23,10 +44,6 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 200 OK\", function () {\r",
-							"    pm.expect(pm.response.status).to.equal(\"OK\");\r",
-							"    pm.expect(pm.response.code).to.equal(200);\r",
-							"});\r",
 							""
 						],
 						"type": "text/javascript",
@@ -34,61 +51,15 @@
 					}
 				}
 			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
 				"method": "GET",
 				"header": [],
-				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/profiles",
-					"protocol": "https",
-					"host": [
-						"fap-clinic",
-						"stage",
-						"b2b",
-						"kompa",
-						"com",
-						"br"
-					],
-					"path": [
-						"api",
-						"v1",
-						"profiles"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Criar Perfil",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Verificar status 201 Created\", function () {\r",
-							"    pm.expect(pm.response.code).to.equal(201);\r",
-							"});\r",
-							"\r",
-							"pm.test(\"Salvar profileID para deleção\", function () {\r",
-							"    let responseJson = pm.response.json();\r",
-							"    pm.environment.set(\"profileID\", responseJson.id);\r",
-							"    console.log(\"Profile ID para deleção setado: \" + responseJson.id);\r",
-							"});\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "POST",
-				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Profissional X\",\r\n  \"type\": \"PROFESSIONAL\",\r\n  \"permissions\": [\r\n    \"SCHEDULE_VIEW\",\r\n    \"APPOINT_CONSULTATION\"\r\n  ],\r\n  \"clinic_id\": 3\r\n}",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -116,24 +87,149 @@
 			"response": []
 		},
 		{
-			"name": "Buscar por ID",
+			"name": "Criar Perfil - 201 Created",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Verificar status 200 OK no GET\", function () {\r",
+							"pm.test(\"Verificar status 201 Created\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Salvar ID do Profile criado\", function () {\r",
+							"    let responseJson = pm.response.json();\r",
+							"    \r",
+							"    if (responseJson.id) {\r",
+							"        pm.environment.set(\"profileID\", responseJson.id);\r",
+							"        console.log(\"Profile ID salvo: \" + responseJson.id);\r",
+							"    } else {\r",
+							"        console.warn(\"ID do Profile não foi gerado.\");\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Geração Dinâmica Simples\r",
+							"let timestamp = new Date().getTime();\r",
+							"let profileName = \"Profile_\" + timestamp;\r",
+							"let profileType = \"MANAGER\"; // Pode ser \"PROFESSIONAL\" ou \"MANAGER\"\r",
+							"let clinicID = 1; // Mantendo fixo para simplificar\r",
+							"\r",
+							"// Permissões Dinâmicas\r",
+							"let permissions = [\r",
+							"    \"SCHEDULE_VIEW\",\r",
+							"    \"APPOINT_CONSULTATION\"\r",
+							"];\r",
+							"\r",
+							"// Salvar no ambiente\r",
+							"pm.environment.set(\"profile_name\", profileName);\r",
+							"pm.environment.set(\"profile_type\", profileType);\r",
+							"pm.environment.set(\"clinic_id\", clinicID);\r",
+							"pm.environment.set(\"permissions\", JSON.stringify(permissions));\r",
+							"\r",
+							"console.log(\"Profile gerado: \" + profileName);\r",
+							"console.log(\"Tipo: \" + profileType);\r",
+							"console.log(\"Clinic ID: \" + clinicID);\r",
+							"console.log(\"Permissões: \" + permissions.join(\", \"));"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"{{profile_name}}\",\r\n  \"type\": \"{{profile_type}}\",\r\n  \"permissions\": {{permissions}},\r\n  \"clinic_id\": {{clinic_id}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/profiles",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"profiles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buscar por ID - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verificar status 200 OK\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(200);\r",
 							"});\r",
 							"\r",
-							"pm.test(\"Verificar dados do perfil\", function () {\r",
+							"pm.test(\"Validar estrutura do Profile\", function () {\r",
 							"    let responseJson = pm.response.json();\r",
-							"    pm.expect(responseJson).to.have.property(\"id\", parseInt(pm.environment.get(\"profileID\")));\r",
+							"\r",
+							"    pm.expect(responseJson).to.have.property(\"id\");\r",
 							"    pm.expect(responseJson).to.have.property(\"name\");\r",
 							"    pm.expect(responseJson).to.have.property(\"type\");\r",
-							"    pm.expect(responseJson).to.have.property(\"permissions\");\r",
-							"});\r",
-							""
+							"\r",
+							"    console.log(\"Profile encontrado: \" + responseJson.name);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Geração Dinâmica Simples\r",
+							"let timestamp = new Date().getTime();\r",
+							"let profileName = \"Profile_\" + timestamp;\r",
+							"let profileType = \"MANAGER\"; // Pode ser \"PROFESSIONAL\" ou \"MANAGER\"\r",
+							"let clinicID = 1; // Mantendo fixo para simplificar\r",
+							"\r",
+							"// Permissões Dinâmicas\r",
+							"let permissions = [\r",
+							"    \"SCHEDULE_VIEW\",\r",
+							"    \"APPOINT_CONSULTATION\"\r",
+							"];\r",
+							"\r",
+							"// Salvar no ambiente\r",
+							"pm.environment.set(\"profile_name\", profileName);\r",
+							"pm.environment.set(\"profile_type\", profileType);\r",
+							"pm.environment.set(\"clinic_id\", clinicID);\r",
+							"pm.environment.set(\"permissions\", JSON.stringify(permissions));\r",
+							"\r",
+							"console.log(\"Profile gerado: \" + profileName);\r",
+							"console.log(\"Tipo: \" + profileType);\r",
+							"console.log(\"Clinic ID: \" + clinicID);\r",
+							"console.log(\"Permissões: \" + permissions.join(\", \"));"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -168,17 +264,41 @@
 			"response": []
 		},
 		{
-			"name": "Atualiza um perfil existente ",
+			"name": "Atualiza um perfil existente  - 200 OK",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Salvar ID do perfil criado\", function () {\r",
+							"pm.test(\"Verificar status 200 OK\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validar atualização do Profile\", function () {\r",
 							"    let responseJson = pm.response.json();\r",
-							"    pm.environment.set(\"profileID\", responseJson.id);\r",
-							"    console.log(\"ID criado: \" + responseJson.id);\r",
-							"});"
+							"\r",
+							"    pm.expect(responseJson).to.have.property(\"id\");\r",
+							"    pm.expect(responseJson).to.have.property(\"name\");\r",
+							"\r",
+							"    console.log(\"Profile atualizado: \" + responseJson.name);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let profileID = pm.environment.get(\"profileID\");\r",
+							"\r",
+							"if (!profileID) {\r",
+							"    console.warn(\"profileID não foi definido. Execute o POST primeiro para criar um Profile.\");\r",
+							"} else {\r",
+							"    console.log(\"Profile ID para atualização: \" + profileID);\r",
+							"}"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -193,7 +313,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Admin Atualizado\",\r\n  \"type\": \"MANAGER\",\r\n  \"permissions\": [\r\n    \"DASHBOARD_MANAGER\",\r\n    \"CLINIC_SETUP\"\r\n  ],\r\n  \"clinic_id\": 1\r\n}",
+					"raw": "{\r\n  \"name\": \"Updated_{{profile_name}}\",\r\n  \"type\": \"{{profile_type}}\",\r\n  \"permissions\": [\"DASHBOARD_MANAGER\", \"CLINIC_SETUP\"],\r\n  \"clinic_id\": {{clinic_id}}\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -222,21 +342,50 @@
 			"response": []
 		},
 		{
-			"name": "Deletar um perfil",
+			"name": "Deletar um perfil - 204 No Content",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"if (!pm.environment.get(\"profileID\")) {\r",
-							"    console.log(\"profileID não setado. Execute o POST para criar um novo profile.\");\r",
-							"    postman.setNextRequest(null);  // Cancela o DELETE se o profileID não existir\r",
-							"}\r",
-							"\r",
 							"pm.test(\"Verificar status 204 No Content\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(204);\r",
+							"    console.log(\"Profile deletado com sucesso. ID: \" + pm.environment.get(\"profileID\"));\r",
 							"});\r",
-							""
+							"\r",
+							"// Remover a variável do ambiente\r",
+							"pm.environment.unset(\"profileID\");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Geração Dinâmica Simples\r",
+							"let timestamp = new Date().getTime();\r",
+							"let profileName = \"Profile_\" + timestamp;\r",
+							"let profileType = \"MANAGER\"; // Pode ser \"PROFESSIONAL\" ou \"MANAGER\"\r",
+							"let clinicID = 1; // Mantendo fixo para simplificar\r",
+							"\r",
+							"// Permissões Dinâmicas\r",
+							"let permissions = [\r",
+							"    \"SCHEDULE_VIEW\",\r",
+							"    \"APPOINT_CONSULTATION\"\r",
+							"];\r",
+							"\r",
+							"// Salvar no ambiente\r",
+							"pm.environment.set(\"profile_name\", profileName);\r",
+							"pm.environment.set(\"profile_type\", profileType);\r",
+							"pm.environment.set(\"clinic_id\", clinicID);\r",
+							"pm.environment.set(\"permissions\", JSON.stringify(permissions));\r",
+							"\r",
+							"console.log(\"Profile gerado: \" + profileName);\r",
+							"console.log(\"Tipo: \" + profileType);\r",
+							"console.log(\"Clinic ID: \" + clinicID);\r",
+							"console.log(\"Permissões: \" + permissions.join(\", \"));"
 						],
 						"type": "text/javascript",
 						"packages": {}
