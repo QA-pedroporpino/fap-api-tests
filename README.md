@@ -23,6 +23,9 @@ Este repositório contém testes automatizados para as APIs do FAP Clinic.
 - **Specialties API**: Testes para o endpoint `/api/v1/specialties`
 - **Speciality Prices API**: Testes para o endpoint `/api/v1/speciality_prices`
 - **Table Prices API**: Testes para o endpoint `/api/v1/table_prices`
+- **Exams API**: Testes para o endpoint `/api/v1/exams`
+- **Certificates API**: Testes para o endpoint `/api/v1/certificates`
+- **Professionals API**: Testes para o endpoint `/api/v1/professionals`
 
 ## Ambientes
 
