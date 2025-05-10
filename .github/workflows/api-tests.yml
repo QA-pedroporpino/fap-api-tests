@@ -28,7 +28,7 @@ jobs:
 
       - name: Run API Tests
         run: |
-          newman run ./api-tests/collection.json -e ./api-tests/environment.json -r cli,htmlextra --reporter-htmlextra-export ./api-tests/reports/report.html
+          newman run ./api-tests/collection.json -r cli,htmlextra --reporter-htmlextra-export ./api-tests/reports/report.html
 
       - name: Print Test Report
         run: cat ./api-tests/reports/report.html
