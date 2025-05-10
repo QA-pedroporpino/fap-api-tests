@@ -7,38 +7,114 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+env:
+  NEWMAN_ENVIRONMENT: 'qa'
+  NEWMAN_TIMEOUT: '300000'
+  NEWMAN_REPORTS_DIR: 'api-tests/reports'
+
 jobs:
   test:
+    name: Run API Tests
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-        
-    - name: Install Newman
-      run: npm install -g newman newman-reporter-htmlextra
-      
-    - name: Run Managers Tests
-      run: |
-        newman run api-tests/collections/-api-v1-managers.postman_collection.json \
-          -r htmlextra \
-          --reporter-htmlextra-export api-tests/reports/managers-report.html \
-          --reporter-htmlextra-title "Managers API Test Report"
-          
-    - name: Run Profiles Tests
-      run: |
-        newman run api-tests/collections/-api-v1-profiles.postman_collection.json \
-          -r htmlextra \
-          --reporter-htmlextra-export api-tests/reports/profiles-report.html \
-          --reporter-htmlextra-title "Profiles API Test Report"
-          
-    - name: Upload Test Reports
-      uses: actions/upload-artifact@v3
-      with:
-        name: api-test-reports
-        path: api-tests/reports/
-        retention-days: 30 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm install -g newman newman-reporter-htmlextra newman-reporter-cli
+
+      - name: Create reports directory
+        run: mkdir -p ${{ env.NEWMAN_REPORTS_DIR }}
+
+      - name: Run Clinics Tests
+        run: |
+          newman run api-tests/collections/-api-v1-clinics.postman_collection.json \
+            -e "api-tests/environments/${{ env.NEWMAN_ENVIRONMENT }}.postman_environment.json" \
+            -r cli,htmlextra \
+            --reporter-htmlextra-export ${{ env.NEWMAN_REPORTS_DIR }}/clinics-report.html \
+            --reporter-htmlextra-title "Clinics API Test Report" \
+            --reporter-htmlextra-darkTheme \
+            --reporter-htmlextra-showOnlyFails \
+            --timeout ${{ env.NEWMAN_TIMEOUT }}
+        continue-on-error: true
+
+      - name: Run Managers Tests
+        run: |
+          newman run api-tests/collections/-api-v1-managers.postman_collection.json \
+            -e "api-tests/environments/${{ env.NEWMAN_ENVIRONMENT }}.postman_environment.json" \
+            -r cli,htmlextra \
+            --reporter-htmlextra-export ${{ env.NEWMAN_REPORTS_DIR }}/managers-report.html \
+            --reporter-htmlextra-title "Managers API Test Report" \
+            --reporter-htmlextra-darkTheme \
+            --reporter-htmlextra-showOnlyFails \
+            --timeout ${{ env.NEWMAN_TIMEOUT }}
+        continue-on-error: true
+
+      - name: Run Profiles Tests
+        run: |
+          newman run api-tests/collections/-api-v1-profiles.postman_collection.json \
+            -e "api-tests/environments/${{ env.NEWMAN_ENVIRONMENT }}.postman_environment.json" \
+            -r cli,htmlextra \
+            --reporter-htmlextra-export ${{ env.NEWMAN_REPORTS_DIR }}/profiles-report.html \
+            --reporter-htmlextra-title "Profiles API Test Report" \
+            --reporter-htmlextra-darkTheme \
+            --reporter-htmlextra-showOnlyFails \
+            --timeout ${{ env.NEWMAN_TIMEOUT }}
+        continue-on-error: true
+
+      - name: Run Speciality Prices Tests
+        run: |
+          newman run api-tests/collections/-api-v1-speciality_prices.postman_collection.json \
+            -e "api-tests/environments/${{ env.NEWMAN_ENVIRONMENT }}.postman_environment.json" \
+            -r cli,htmlextra \
+            --reporter-htmlextra-export ${{ env.NEWMAN_REPORTS_DIR }}/speciality-prices-report.html \
+            --reporter-htmlextra-title "Speciality Prices API Test Report" \
+            --reporter-htmlextra-darkTheme \
+            --reporter-htmlextra-showOnlyFails \
+            --timeout ${{ env.NEWMAN_TIMEOUT }}
+        continue-on-error: true
+
+      - name: Run Specialties Tests
+        run: |
+          newman run api-tests/collections/-api-v1-specialties.postman_collection.json \
+            -e "api-tests/environments/${{ env.NEWMAN_ENVIRONMENT }}.postman_environment.json" \
+            -r cli,htmlextra \
+            --reporter-htmlextra-export ${{ env.NEWMAN_REPORTS_DIR }}/specialties-report.html \
+            --reporter-htmlextra-title "Specialties API Test Report" \
+            --reporter-htmlextra-darkTheme \
+            --reporter-htmlextra-showOnlyFails \
+            --timeout ${{ env.NEWMAN_TIMEOUT }}
+        continue-on-error: true
+
+      - name: Run Table Prices Tests
+        run: |
+          newman run api-tests/collections/-api-v1-table_prices.postman_collection.json \
+            -e "api-tests/environments/${{ env.NEWMAN_ENVIRONMENT }}.postman_environment.json" \
+            -r cli,htmlextra \
+            --reporter-htmlextra-export ${{ env.NEWMAN_REPORTS_DIR }}/table-prices-report.html \
+            --reporter-htmlextra-title "Table Prices API Test Report" \
+            --reporter-htmlextra-darkTheme \
+            --reporter-htmlextra-showOnlyFails \
+            --timeout ${{ env.NEWMAN_TIMEOUT }}
+        continue-on-error: true
+
+      - name: Upload Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: api-test-reports
+          path: ${{ env.NEWMAN_REPORTS_DIR }}
+          retention-days: 30
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "::error::Some API tests failed. Check the reports for details." 
