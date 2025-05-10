@@ -1,0 +1,68 @@
+{
+	"info": {
+		"_postman_id": "fd50b1e0-8c01-4900-a7e7-4402b120fe40",
+		"name": "/api/v1/certificates",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37354928"
+	},
+	"item": [
+		{
+			"name": "Listar todos os certificados - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verificar status 200 OK\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Verificar estrutura da resposta de Health\", function () {\r",
+							"    let responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson).to.have.property(\"success\");\r",
+							"    pm.expect(responseJson.success).to.be.a(\"boolean\");\r",
+							"    pm.expect(responseJson.success).to.be.true;\r",
+							"    console.log(\"Health Check - Resposta: \" + JSON.stringify(responseJson));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/health",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"health"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
