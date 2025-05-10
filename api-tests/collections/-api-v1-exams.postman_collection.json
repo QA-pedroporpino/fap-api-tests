@@ -1,0 +1,422 @@
+{
+	"info": {
+		"_postman_id": "43e271ff-d9cb-4bd0-9c05-0f9072f44834",
+		"name": "/api/v1/exams",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37354928"
+	},
+	"item": [
+		{
+			"name": "Listar todos os exames  - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verificar se o status é 200 OK\r",
+							"pm.test(\"Status 200 OK\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"// Verificar se a resposta é um objeto\r",
+							"pm.test(\"Resposta é um objeto\", function () {\r",
+							"    let responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson).to.be.an(\"object\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Gerar um nome dinâmico para o exame\r",
+							"let timestamp = new Date().getTime();\r",
+							"let examName = \"Exame_\" + timestamp;\r",
+							"\r",
+							"// Salvar as variáveis no ambiente\r",
+							"pm.environment.set(\"exam_name\", examName);\r",
+							"console.log(\"Nome do Exame gerado: \" + examName);\r",
+							"\r",
+							"// Verificar se o examID está definido para métodos GET, PUT e DELETE\r",
+							"let examID = pm.environment.get(\"examID\");\r",
+							"\r",
+							"if (!examID && pm.request.method !== \"POST\") {\r",
+							"    console.warn(\"examID não está definido. Execute o POST primeiro para criar um Exame.\");\r",
+							"} else {\r",
+							"    console.log(\"Exam ID: \" + examID);\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/exams",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"exams"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Criar um novo exame - 201 Created",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verificar status 201 Created\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Salvar ID do Exame criado\", function () {\r",
+							"    let responseJson = pm.response.json();\r",
+							"    \r",
+							"    if (responseJson.id) {\r",
+							"        pm.environment.set(\"examID\", responseJson.id);\r",
+							"        console.log(\"Exam ID salvo: \" + responseJson.id);\r",
+							"    } else {\r",
+							"        console.log(\"Erro: ID do Exame não foi gerado.\");\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Lista de especialidades permitidas\r",
+							"const specialties = [\"Cardiologia\", \"Neurologia\", \"Oftalmologia\", \"Ortopedia\", \"Dermatologia\"];\r",
+							"\r",
+							"// Gerar um nome dinâmico baseado em uma especialidade existente\r",
+							"let timestamp = new Date().getTime();\r",
+							"let randomSpecialty = specialties[Math.floor(Math.random() * specialties.length)];\r",
+							"let examName = randomSpecialty + \"_\" + timestamp;\r",
+							"\r",
+							"// Salvar as variáveis no ambiente\r",
+							"pm.environment.set(\"exam_name\", examName);\r",
+							"pm.environment.set(\"updated_exam_name\", randomSpecialty);\r",
+							"\r",
+							"console.log(\"Nome do Exame gerado: \" + examName);\r",
+							"console.log(\"Especialidade selecionada para PUT: \" + randomSpecialty);\r",
+							"\r",
+							"// Verificar se o examID está definido (usado no PUT e DELETE)\r",
+							"let examID = pm.environment.get(\"examID\");\r",
+							"\r",
+							"if (!examID && pm.request.method !== \"POST\") {\r",
+							"    console.warn(\"examID não está definido. Execute o POST primeiro para criar um Exame.\");\r",
+							"} else {\r",
+							"    console.log(\"Exam ID para atualização/deleção: \" + examID);\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"{{exam_name}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/exams",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"exams"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obter exame por ID - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verificar status 200 OK\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validar estrutura do Exame\", function () {\r",
+							"    let responseJson = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseJson).to.have.property(\"id\");\r",
+							"    pm.expect(responseJson).to.have.property(\"name\");\r",
+							"\r",
+							"    console.log(\"Exame encontrado: \" + responseJson.name);\r",
+							"    console.log(\"Exam ID: \" + responseJson.id);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Gerar um nome dinâmico para o exame\r",
+							"let timestamp = new Date().getTime();\r",
+							"let examName = \"Exame_\" + timestamp;\r",
+							"\r",
+							"// Salvar as variáveis no ambiente\r",
+							"pm.environment.set(\"exam_name\", examName);\r",
+							"console.log(\"Nome do Exame gerado: \" + examName);\r",
+							"\r",
+							"// Verificar se o examID está definido para métodos GET, PUT e DELETE\r",
+							"let examID = pm.environment.get(\"examID\");\r",
+							"\r",
+							"if (!examID && pm.request.method !== \"POST\") {\r",
+							"    console.warn(\"examID não está definido. Execute o POST primeiro para criar um Exame.\");\r",
+							"} else {\r",
+							"    console.log(\"Exam ID: \" + examID);\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/exams/{{examID}}",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"exams",
+						"{{examID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Atualizar um Exame existente - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verificar status 200 OK\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validar atualização do Exame\", function () {\r",
+							"    let responseJson = pm.response.json();\r",
+							"    \r",
+							"    let expectedName = pm.environment.get(\"updated_exam_name\");\r",
+							"\r",
+							"    if (responseJson.name) {\r",
+							"        pm.expect(responseJson.name).to.equal(expectedName);\r",
+							"        console.log(\"Exame atualizado para: \" + responseJson.name);\r",
+							"    } else {\r",
+							"        console.warn(\"Campo 'name' não presente na resposta.\");\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Lista de especialidades permitidas\r",
+							"const specialties = [\"Cardiologia\", \"Neurologia\", \"Oftalmologia\", \"Ortopedia\", \"Dermatologia\"];\r",
+							"\r",
+							"// Gerar um nome dinâmico baseado em uma especialidade existente\r",
+							"let timestamp = new Date().getTime();\r",
+							"let randomSpecialty = specialties[Math.floor(Math.random() * specialties.length)];\r",
+							"let examName = randomSpecialty + \"_\" + timestamp;\r",
+							"\r",
+							"// Salvar as variáveis no ambiente\r",
+							"pm.environment.set(\"exam_name\", examName);\r",
+							"pm.environment.set(\"updated_exam_name\", randomSpecialty);\r",
+							"\r",
+							"console.log(\"Nome do Exame gerado: \" + examName);\r",
+							"console.log(\"Especialidade selecionada para PUT: \" + randomSpecialty);\r",
+							"\r",
+							"// Verificar se o examID está definido (usado no PUT e DELETE)\r",
+							"let examID = pm.environment.get(\"examID\");\r",
+							"\r",
+							"if (!examID && pm.request.method !== \"POST\") {\r",
+							"    console.warn(\"examID não está definido. Execute o POST primeiro para criar um Exame.\");\r",
+							"} else {\r",
+							"    console.log(\"Exam ID para atualização/deleção: \" + examID);\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"{{updated_exam_name}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/exams/{{examID}}",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"exams",
+						"{{examID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Excluir um exame - 204 No Content",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verificar status 204 No Content\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(204);\r",
+							"    console.log(\"Exame deletado com sucesso. ID: \" + pm.environment.get(\"examID\"));\r",
+							"});\r",
+							"\r",
+							"// Remover o examID do ambiente após a deleção\r",
+							"pm.environment.unset(\"examID\");\r",
+							"console.log(\"examID removido do ambiente após a deleção.\");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Verificar se o examID está definido\r",
+							"let examID = pm.environment.get(\"examID\");\r",
+							"\r",
+							"if (!examID) {\r",
+							"    console.warn(\"examID não está definido. Execute o POST primeiro para criar um Exame.\");\r",
+							"} else {\r",
+							"    console.log(\"Exame ID para deleção: \" + examID);\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/exams/{{examID}}\n",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"exams",
+						"{{examID}}\n"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
