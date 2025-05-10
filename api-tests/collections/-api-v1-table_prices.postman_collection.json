@@ -242,10 +242,7 @@
 				},
 				"method": "DELETE",
 				"header": [],
-				"body": {
-					"mode": "file",
-					"file": {}
-				},
+				"body": {},
 				"url": {
 					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/table_prices/{{tablePriceID}}",
 					"protocol": "https",

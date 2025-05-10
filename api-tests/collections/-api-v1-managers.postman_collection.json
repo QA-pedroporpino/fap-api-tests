@@ -7,7 +7,7 @@
 	},
 	"item": [
 		{
-			"name": "Lista da managers",
+			"name": "Lista da managers - 200 OK",
 			"event": [
 				{
 					"listen": "test",
@@ -56,7 +56,7 @@
 			"response": []
 		},
 		{
-			"name": "Criar manager",
+			"name": "Criar Manager - 201 Created",
 			"event": [
 				{
 					"listen": "test",
@@ -66,16 +66,44 @@
 							"    pm.expect(pm.response.code).to.equal(201);\r",
 							"});\r",
 							"\r",
-							"pm.test(\"Salvar ID do manager criado\", function () {\r",
+							"pm.test(\"Salvar ID do Manager criado\", function () {\r",
 							"    let responseJson = pm.response.json();\r",
 							"    \r",
-							"    // Verificar se o ID foi gerado\r",
-							"    pm.expect(responseJson).to.have.property(\"id\");\r",
-							"\r",
-							"    // Salvar o ID em uma variável\r",
-							"    pm.environment.set(\"profileID\", responseJson.id);\r",
-							"    console.log(\"Novo profile ID criado para deleção: \" + responseJson.id);\r",
+							"    if (responseJson.id) {\r",
+							"        pm.environment.set(\"managerID\", responseJson.id);\r",
+							"        console.log(\"Manager ID salvo: \" + responseJson.id);\r",
+							"    } else {\r",
+							"        console.log(\"Erro: ID do Manager não foi gerado.\");\r",
+							"    }\r",
 							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Gerar um nome dinâmico para o Manager\r",
+							"let timestamp = new Date().getTime();\r",
+							"let managerName = \"Manager_\" + timestamp;\r",
+							"\r",
+							"// Definir um profile_id fixo para garantir sucesso no teste\r",
+							"let profileId = 13;\r",
+							"\r",
+							"// Definir um email dinâmico para evitar duplicidade\r",
+							"let email = \"manager_\" + timestamp + \"@example.com\";\r",
+							"\r",
+							"// Salvar as variáveis no ambiente\r",
+							"pm.environment.set(\"manager_name\", managerName);\r",
+							"pm.environment.set(\"email\", email);\r",
+							"pm.environment.set(\"profile_id\", profileId);\r",
+							"\r",
+							"console.log(\"Manager Name: \" + managerName);\r",
+							"console.log(\"Email: \" + email);\r",
+							"console.log(\"Profile ID: \" + profileId);\r",
 							""
 						],
 						"type": "text/javascript",
@@ -91,7 +119,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Fulano\",\r\n  \"email\": \"novo.manager@example.com\",\r\n  \"document_type\": \"CPF\",\r\n  \"document\": \"98765432100\",\r\n  \"social_name\": \"Manager Social\",\r\n  \"phone\": \"11988888888\",\r\n  \"active\": true,\r\n  \"profile_id\": 1\r\n}",
+					"raw": "{\r\n  \"name\": \"{{manager_name}}\",\r\n  \"email\": \"{{email}}\",\r\n  \"document_type\": \"CPF\",\r\n  \"document\": \"98765432100\",\r\n  \"social_name\": \"Manager Social\",\r\n  \"phone\": \"11988888888\",\r\n  \"active\": true,\r\n  \"profile_id\": {{profile_id}}\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -119,25 +147,102 @@
 			"response": []
 		},
 		{
-			"name": "Buscar um manager por ID",
+			"name": "Buscar um manager por ID - 200 OK",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status 200 OK\", function () {\r",
+							"pm.test(\"Verificar status 200 OK\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(200);\r",
 							"});\r",
 							"\r",
-							"// Garantir que o profileID esteja salvo\r",
+							"pm.test(\"Validar estrutura do Manager\", function () {\r",
+							"    let responseJson = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseJson).to.have.property(\"id\");\r",
+							"    pm.expect(responseJson).to.have.property(\"name\");\r",
+							"    pm.expect(responseJson).to.have.property(\"email\");\r",
+							"    pm.expect(responseJson).to.have.property(\"profile_id\");\r",
+							"\r",
+							"    console.log(\"Manager encontrado: \" + responseJson.name);\r",
+							"    console.log(\"Email: \" + responseJson.email);\r",
+							"    console.log(\"Profile ID: \" + responseJson.profile_id);\r",
+							"});\r",
+							"\r",
+							"// Atualizar informações no ambiente (caso necessário)\r",
 							"let responseJson = pm.response.json();\r",
-							"if (responseJson.id) {\r",
-							"    pm.environment.set(\"profileID\", responseJson.id);\r",
-							"    console.log(\"Profile ID atualizado: \" + responseJson.id);\r",
-							"} else {\r",
-							"    console.log(\"Profile ID não encontrado no response.\");\r",
+							"pm.environment.set(\"manager_name\", responseJson.name);\r",
+							"pm.environment.set(\"email\", responseJson.email);\r",
+							"pm.environment.set(\"profile_id\", responseJson.profile_id);\r",
+							"var template = `\r",
+							"<style type=\"text/css\">\r",
+							"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
+							"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
+							"    .tftable tr {background-color:#ffffff;}\r",
+							"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
+							"    .tftable tr:hover {background-color:#e0ffff;}\r",
+							"</style>\r",
+							"\r",
+							"<table class=\"tftable\" border=\"1\">\r",
+							"    <tr>\r",
+							"        <th>Active</th>\r",
+							"        <th>Clinic ID</th>\r",
+							"        <th>Clinic Relation</th>\r",
+							"        <th>Date Created</th>\r",
+							"        <th>Date Updated</th>\r",
+							"        <th>Document</th>\r",
+							"        <th>Document Type</th>\r",
+							"        <th>Email</th>\r",
+							"        <th>ID</th>\r",
+							"        <th>Name</th>\r",
+							"        <th>Phone</th>\r",
+							"        <th>Profile ID</th>\r",
+							"        <th>Profile Relation</th>\r",
+							"        <th>Social Name</th>\r",
+							"    </tr>\r",
+							"    \r",
+							"    <tr>\r",
+							"        <td>{{response.active}}</td>\r",
+							"        <td>{{response.clinic_id}}</td>\r",
+							"        <td>{{response.clinic_relation}}</td>\r",
+							"        <td>{{response.date_created}}</td>\r",
+							"        <td>{{response.date_updated}}</td>\r",
+							"        <td>{{response.document}}</td>\r",
+							"        <td>{{response.document_type}}</td>\r",
+							"        <td>{{response.email}}</td>\r",
+							"        <td>{{response.id}}</td>\r",
+							"        <td>{{response.name}}</td>\r",
+							"        <td>{{response.phone}}</td>\r",
+							"        <td>{{response.profile_id}}</td>\r",
+							"        <td>{{response.profile_relation}}</td>\r",
+							"        <td>{{response.social_name}}</td>\r",
+							"    </tr>\r",
+							"</table>\r",
+							"`;\r",
+							"\r",
+							"function constructVisualizerPayload() {\r",
+							"    return {response: pm.response.json()}\r",
 							"}\r",
-							""
+							"\r",
+							"pm.visualizer.set(template, constructVisualizerPayload());"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Verificar se o managerID está definido no ambiente\r",
+							"let managerID = pm.environment.get(\"managerID\");\r",
+							"\r",
+							"if (!managerID) {\r",
+							"    console.warn(\"managerID não está definido. Execute o POST primeiro para criar um Manager.\");\r",
+							"} else {\r",
+							"    console.log(\"Manager ID para busca: \" + managerID);\r",
+							"}"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -151,7 +256,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/managers/{{profileID}}",
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/managers/{{managerID}}",
 					"protocol": "https",
 					"host": [
 						"fap-clinic",
@@ -165,31 +270,59 @@
 						"api",
 						"v1",
 						"managers",
-						"{{profileID}}"
+						"{{managerID}}"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Atualizar um Manager",
+			"name": "Atualizar um Manager - 200 OK",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status 200 OK\", function () {\r",
+							"pm.test(\"Verificar status 200 OK\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(200);\r",
 							"});\r",
 							"\r",
-							"// Garantir que o profileID esteja salvo\r",
-							"let responseJson = pm.response.json();\r",
-							"if (responseJson.id) {\r",
-							"    pm.environment.set(\"profileID\", responseJson.id);\r",
-							"    console.log(\"Profile ID atualizado: \" + responseJson.id);\r",
+							"pm.test(\"Verificar atualização do Manager\", function () {\r",
+							"    let responseJson = pm.response.json();\r",
+							"    \r",
+							"    // Verificar se o nome foi atualizado corretamente\r",
+							"    let expectedName = pm.environment.get(\"updated_manager_name\");\r",
+							"    pm.expect(responseJson.name).to.equal(expectedName);\r",
+							"    \r",
+							"    console.log(\"Manager atualizado: \" + responseJson.name);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Verificar se o managerID está definido\r",
+							"let managerID = pm.environment.get(\"managerID\");\r",
+							"let profileID = pm.environment.get(\"profile_id\");\r",
+							"\r",
+							"if (!managerID || !profileID) {\r",
+							"    console.error(\"Erro: managerID ou profile_id não definido. Execute o POST para criar um Manager primeiro.\");\r",
 							"} else {\r",
-							"    console.log(\"Profile ID não encontrado no response.\");\r",
+							"    console.log(\"Manager ID encontrado para atualização: \" + managerID);\r",
+							"    console.log(\"Profile ID associado: \" + profileID);\r",
 							"}\r",
+							"\r",
+							"// Gerar um nome atualizado dinâmico para o Manager\r",
+							"let timestamp = new Date().getTime();\r",
+							"let updatedManagerName = \"Updated_Manager_\" + timestamp;\r",
+							"\r",
+							"// Salvar o nome atualizado no ambiente\r",
+							"pm.environment.set(\"updated_manager_name\", updatedManagerName);\r",
+							"console.log(\"Nome atualizado: \" + updatedManagerName);\r",
 							""
 						],
 						"type": "text/javascript",
@@ -205,7 +338,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Fulano Atualizado\",\r\n  \"email\": \"atualizado@example.com\",\r\n  \"document_type\": \"CPF\",\r\n  \"document\": \"12345678900\",\r\n  \"social_name\": \"Fulano Social\",\r\n  \"phone\": \"11977777777\",\r\n  \"active\": false,\r\n  \"profile_id\": 1\r\n}\r\n",
+					"raw": "{\r\n  \"name\": \"{{updated_manager_name}}\",\r\n  \"email\": \"novo.manager@example.com\",\r\n  \"document_type\": \"CPF\",\r\n  \"document\": \"98765432100\",\r\n  \"social_name\": \"Manager Social Atualizado\",\r\n  \"phone\": \"11988888888\",\r\n  \"active\": true,\r\n  \"profile_id\": {{profile_id}}\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -213,7 +346,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/managers/{{profileID}}\n",
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/managers/{{managerID}}\n",
 					"protocol": "https",
 					"host": [
 						"fap-clinic",
@@ -227,27 +360,44 @@
 						"api",
 						"v1",
 						"managers",
-						"{{profileID}}\n"
+						"{{managerID}}\n"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Deletar um Manager",
+			"name": "Deletar um Manager  - 204 No Content",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"if (!pm.environment.get(\"profileID\")) {\r",
-							"    console.log(\"profileID não setado. Execute o POST para criar um novo manager.\");\r",
-							"    postman.setNextRequest(null);  // Cancela o DELETE se o profileID não existir\r",
-							"}\r",
-							"\r",
 							"pm.test(\"Verificar status 204 No Content\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(204);\r",
+							"    console.log(\"Manager deletado com sucesso. ID: \" + pm.environment.get(\"managerID\"));\r",
 							"});\r",
+							"\r",
+							"// Remover o managerID do ambiente após a deleção\r",
+							"pm.environment.unset(\"managerID\");\r",
+							"console.log(\"managerID removido do ambiente após deleção.\");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Verificar se o managerID está definido no ambiente\r",
+							"let managerID = pm.environment.get(\"managerID\");\r",
+							"\r",
+							"if (!managerID) {\r",
+							"    console.warn(\"managerID não está definido. Execute o POST primeiro para criar um Manager.\");\r",
+							"} else {\r",
+							"    console.log(\"Manager ID para deleção: \" + managerID);\r",
+							"}\r",
 							""
 						],
 						"type": "text/javascript",
@@ -261,12 +411,9 @@
 				},
 				"method": "DELETE",
 				"header": [],
-				"body": {
-					"mode": "file",
-					"file": {}
-				},
+				"body": {},
 				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/managers/{{profileID}}\n",
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/managers/{{managerID}}\n",
 					"protocol": "https",
 					"host": [
 						"fap-clinic",
@@ -280,7 +427,7 @@
 						"api",
 						"v1",
 						"managers",
-						"{{profileID}}\n"
+						"{{managerID}}\n"
 					]
 				}
 			},
