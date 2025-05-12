@@ -11,12 +11,18 @@ Este repositório contém testes automatizados para as APIs do sistema FAP, util
 │       └── api-tests.yml
 ├── api-tests/
 │   ├── collections/
+│   │   ├── -api-v1-certificates.postman_collection.json
 │   │   ├── -api-v1-clinics.postman_collection.json
+│   │   ├── -api-v1-exams.postman_collection.json
+│   │   ├── -api-v1-exams_prices.postman_collection.json
+│   │   ├── -api-v1-health.postman_collection.json
 │   │   ├── -api-v1-managers.postman_collection.json
 │   │   ├── -api-v1-profiles.postman_collection.json
+│   │   ├── -api-v1-professionals.postman_collection.json
 │   │   ├── -api-v1-speciality_prices.postman_collection.json
 │   │   ├── -api-v1-specialties.postman_collection.json
 │   │   └── -api-v1-table_prices.postman_collection.json
+│   ├── environments/
 │   └── reports/
 └── run-all-tests.ps1
 ```
@@ -76,9 +82,14 @@ Os relatórios podem ser baixados na aba "Artifacts" de cada execução do workf
 
 O projeto inclui as seguintes coleções de testes:
 
+- Certificates API Tests
 - Clinics API Tests
+- Exams API Tests
+- Exams Prices API Tests
+- Health API Tests
 - Managers API Tests
 - Profiles API Tests
+- Professionals API Tests
 - Speciality Prices API Tests
 - Specialties API Tests
 - Table Prices API Tests

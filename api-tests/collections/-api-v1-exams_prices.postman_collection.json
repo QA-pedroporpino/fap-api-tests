@@ -1,0 +1,342 @@
+{
+	"info": {
+		"_postman_id": "3de0d9a1-b5ac-4d64-8249-4b92285afa2a",
+		"name": "/api/v1/exams_prices",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37354928"
+	},
+	"item": [
+		{
+			"name": "Listar todos os preços de exames  - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contém o campo num_results\", function () {\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"num_results\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/exam_prices",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"exam_prices"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Criar um novo preço de exame - 201 Created",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Salvar ID do Preço de Exame Criado\", function () {\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.environment.set(\"priceId\", jsonData.id);\r",
+							"    console.log(\"ID salvo: \" + jsonData.id);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Definir valores dinâmicos\r",
+							"let uniqueTimestamp = Date.now();\r",
+							"pm.environment.set(\"dynamicTablePriceId\", 1);\r",
+							"pm.environment.set(\"dynamicExamId\", 1);\r",
+							"pm.environment.set(\"dynamicTitle\", \"Consulta \" + uniqueTimestamp);\r",
+							"pm.environment.set(\"dynamicSla\", Math.floor(Math.random() * (72 - 24 + 1)) + 24); // SLA entre 24 e 72 horas\r",
+							"pm.environment.set(\"dynamicPrice\", Math.floor(Math.random() * (500 - 100 + 1)) + 100); // Preço entre 100 e 500"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"table_price_id\": {{dynamicTablePriceId}},\r\n  \"exam_id\": {{dynamicExamId}},\r\n  \"title\": \"{{dynamicTitle}}\",\r\n  \"sla\": {{dynamicSla}},\r\n  \"price\": {{dynamicPrice}}\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/exam_prices",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"exam_prices"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obter preço de exame por ID - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Verificar o campo 'title'\", function () {\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.title).to.include(\"Consulta\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Verificar se o ID foi salvo\r",
+							"pm.test(\"Verificar se o ID foi salvo\", function () {\r",
+							"    pm.expect(pm.environment.get(\"priceId\")).to.not.be.undefined;\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/exam_prices/{{priceId}}",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"exam_prices",
+						"{{priceId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Atualizar um preço de Exame existente - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Verificar atualização do campo 'title'\", function () {\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.title).to.include(\"Atualizada\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Definir valores dinâmicos para atualização\r",
+							"let uniqueTimestamp = Date.now();\r",
+							"pm.environment.set(\"updatedTablePriceId\", 3);\r",
+							"pm.environment.set(\"updatedTitle\", \"Consulta Atualizada \" + uniqueTimestamp);\r",
+							"pm.environment.set(\"updatedSla\", Math.floor(Math.random() * (72 - 24 + 1)) + 24); // SLA entre 24 e 72 horas\r",
+							"pm.environment.set(\"updatedPrice\", Math.floor(Math.random() * (500 - 100 + 1)) + 100); // Preço entre 100 e 500\r",
+							"\r",
+							"// Verificar se o ID foi salvo\r",
+							"pm.test(\"Verificar se o ID foi salvo\", function () {\r",
+							"    pm.expect(pm.environment.get(\"priceId\")).to.not.be.undefined;\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"table_price_id\": {{updatedTablePriceId}},\r\n  \"title\": \"{{updatedTitle}}\",\r\n  \"sla\": {{updatedSla}},\r\n  \"price\": {{updatedPrice}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/exam_prices/{{priceId}}",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"exam_prices",
+						"{{priceId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Excluir um preço de exame - 204 No Content",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(204);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Verificar exclusão\", function () {\r",
+							"    console.log(\"Preço de exame excluído: \" + pm.environment.get(\"priceId\"));\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Verificar se o ID foi salvo\r",
+							"pm.test(\"Verificar se o ID foi salvo\", function () {\r",
+							"    pm.expect(pm.environment.get(\"priceId\")).to.not.be.undefined;\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/exam_prices/{{priceId}}\n",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"exam_prices",
+						"{{priceId}}\n"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
