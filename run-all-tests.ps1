@@ -11,16 +11,14 @@ if (-not (Test-Path $reportsPath)) {
 
 # Current date and time for report name
 $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
-$reportName = "test-report-$timestamp"
 
 # Create report directory
-$reportDir = "$reportsPath/$reportName"
+$reportDir = "$reportsPath/$timestamp"
 if (-not (Test-Path $reportDir)) {
     New-Item -ItemType Directory -Path $reportDir
 }
 
-# Create temporary file to list all collections
-$collectionsList = "collections-list.json"
+# Collections to run
 $collections = @(
     "api-tests/collections/-api-v1-certificates.postman_collection.json",
     "api-tests/collections/-api-v1-clinics.postman_collection.json",
@@ -34,21 +32,24 @@ $collections = @(
     "api-tests/collections/-api-v1-specialties.postman_collection.json",
     "api-tests/collections/-api-v1-table_prices.postman_collection.json"
 )
-$collections | ConvertTo-Json | Out-File -FilePath $collectionsList
 
-# Run all collections with a single report
+# Run all collections with individual reports
 Write-Host "`nRunning all collections..." -ForegroundColor Green
 
-# Run each collection individually and combine results
+# Run each collection individually with its own report
 foreach ($collection in $collections) {
-    Write-Host "`nRunning collection: $collection`n"
-    newman run $collection -r cli
+    $collectionName = [System.IO.Path]::GetFileNameWithoutExtension($collection)
+    Write-Host "`nRunning collection: $collectionName`n" -ForegroundColor Yellow
+    
+    newman run $collection `
+        -r cli,htmlextra `
+        --reporter-htmlextra-export "$reportDir/$collectionName-report.html" `
+        --reporter-htmlextra-title "$collectionName Test Report" `
+        --reporter-htmlextra-darkTheme `
+        --reporter-htmlextra-showOnlyFails
 }
-
-# Remove temporary file
-Remove-Item $collectionsList
 
 Write-Host "`n===============================================" -ForegroundColor Green
 Write-Host "All tests have been executed!" -ForegroundColor Green
-Write-Host "Combined report available at: $reportDir/combined-report.html" -ForegroundColor Yellow
+Write-Host "Reports available at: $reportDir" -ForegroundColor Yellow
 Write-Host "===============================================" -ForegroundColor Green 

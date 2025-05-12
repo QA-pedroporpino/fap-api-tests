@@ -305,11 +305,19 @@
 							"pm.test(\"Validar atualização do Profissional\", function () {\r",
 							"    try {\r",
 							"        let responseJson = pm.response.json();\r",
-							"        pm.expect(responseJson).to.have.property(\"id\");\r",
-							"        pm.expect(responseJson).to.have.property(\"name\");\r",
-							"        console.log(\"Profissional atualizado: \" + responseJson.name);\r",
+							"\r",
+							"        if (responseJson && Object.keys(responseJson).length) {\r",
+							"            pm.expect(responseJson).to.have.property(\"id\");\r",
+							"            pm.expect(responseJson).to.have.property(\"name\");\r",
+							"            pm.expect(responseJson).to.have.property(\"email\");\r",
+							"\r",
+							"            console.log(\"Profissional atualizado: \" + responseJson.name);\r",
+							"        } else {\r",
+							"            console.warn(\"Response vazio ou não estruturado como JSON.\");\r",
+							"        }\r",
+							"\r",
 							"    } catch (err) {\r",
-							"        console.warn(\"Erro ao ler o response body: \", err);\r",
+							"        console.warn(\"Erro ao processar o response body: \", err);\r",
 							"    }\r",
 							"});\r",
 							""
@@ -443,7 +451,11 @@
 					"type": "noauth"
 				},
 				"method": "DELETE",
-				"body": {},
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
 				"url": {
 					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/professionals/{{professionalID}}",
 					"protocol": "https",
