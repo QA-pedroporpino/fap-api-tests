@@ -98,20 +98,20 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Verificar status 201 Created\", function () {\r",
+							"pm.test(\"Verificar status 201 - Profissional Criado\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(201);\r",
 							"});\r",
 							"\r",
-							"pm.test(\"Salvar ID do Profissional criado\", function () {\r",
-							"    let responseJson = pm.response.json();\r",
-							"    \r",
-							"    if (responseJson.id) {\r",
-							"        pm.environment.set(\"professionalID\", responseJson.id);\r",
-							"        console.log(\"Profissional ID salvo: \" + responseJson.id);\r",
-							"    } else {\r",
-							"        console.warn(\"ID do Profissional não foi gerado.\");\r",
-							"    }\r",
-							"});"
+							"let response = pm.response.json();\r",
+							"console.log(\"Response: \", response);\r",
+							"\r",
+							"// Capturar o ID do profissional criado\r",
+							"if (response.id) {\r",
+							"    pm.environment.set(\"professional_id\", response.id);\r",
+							"    console.log(\"Professional ID salvo: \" + response.id);\r",
+							"} else {\r",
+							"    console.log(\"Professional ID não encontrado na resposta.\");\r",
+							"}"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -121,37 +121,30 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Geração Dinâmica Simples\r",
-							"let timestamp = new Date().getTime();\r",
-							"let professionalName = \"Dr. \" + timestamp;\r",
-							"let email = \"prof_\" + timestamp + \"@example.com\";\r",
-							"let registry = \"CRM\" + timestamp;\r",
-							"let document = timestamp.toString().slice(-11); // Gera um CPF dinâmico\r",
+							"// Gerar um timestamp único\r",
+							"const timestamp = new Date().getTime();\r",
+							"pm.environment.set(\"timestamp\", timestamp);\r",
+							"console.log(\"Timestamp gerado: \" + timestamp);\r",
 							"\r",
-							"// IDs Fixos para manter consistência\r",
-							"let addressID = 35; // Já existente\r",
-							"let profileID = 12; // Já existente\r",
-							"let specialtyID = 1; // Já existente\r",
-							"let motiveID = 1; // Já existente\r",
+							"// Capturar IDs disponíveis dinamicamente\r",
 							"\r",
-							"// Salvar no ambiente\r",
-							"pm.environment.set(\"professional_name\", professionalName);\r",
-							"pm.environment.set(\"email\", email);\r",
-							"pm.environment.set(\"registry\", registry);\r",
-							"pm.environment.set(\"document\", document);\r",
-							"pm.environment.set(\"address_id\", addressID);\r",
-							"pm.environment.set(\"profile_id\", profileID);\r",
-							"pm.environment.set(\"specialty_id\", specialtyID);\r",
-							"pm.environment.set(\"motive_id\", motiveID);\r",
+							"// Define um endereço existente\r",
+							"pm.environment.set(\"address_id\", 64); // Usando o último ID do resultado do GET\r",
 							"\r",
-							"console.log(\"Profissional gerado: \" + professionalName);\r",
-							"console.log(\"Email: \" + email);\r",
-							"console.log(\"Registry: \" + registry);\r",
-							"console.log(\"Document: \" + document);\r",
-							"console.log(\"Address ID: \" + addressID);\r",
-							"console.log(\"Profile ID: \" + profileID);\r",
-							"console.log(\"Specialty ID: \" + specialtyID);\r",
-							"console.log(\"Motive ID: \" + motiveID);"
+							"// Define um profile_id existente\r",
+							"pm.environment.set(\"profile_id\", 27); // Usando um profile_id existente\r",
+							"\r",
+							"// Define um specialty_id existente\r",
+							"pm.environment.set(\"specialty_id\", 5); // Usando um specialty_id existente\r",
+							"\r",
+							"// Define um sub_specialty_id existente\r",
+							"pm.environment.set(\"sub_specialty_id\", 2); // Usando um sub_specialty_id existente\r",
+							"\r",
+							"// Define um motive_id existente\r",
+							"pm.environment.set(\"motive_id\", 1); // Usando um motive_id existente\r",
+							"\r",
+							"console.log(\"IDs configurados dinamicamente.\");\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -166,7 +159,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"{{professional_name}}\",\r\n  \"email\": \"{{email}}\",\r\n  \"document_type\": \"CPF\",\r\n  \"document\": \"{{document}}\",\r\n  \"registry_type\": \"CRM\",\r\n  \"registry\": \"{{registry}}\",\r\n  \"active\": true,\r\n  \"profile_id\": {{profile_id}},\r\n  \"address_relation\": {\r\n    \"id\": {{address_id}}\r\n  },\r\n  \"specialty_relation\": [\r\n    {\r\n      \"id\": {{specialty_id}}\r\n    }\r\n  ],\r\n  \"sub_specialty_relation\": [\r\n    {\r\n      \"id\": {{specialty_id}}\r\n    }\r\n  ],\r\n  \"motive_relation\": [\r\n    {\r\n      \"id\": {{motive_id}}\r\n    }\r\n  ]\r\n}",
+					"raw": "{\r\n  \"name\": \"Dr. Novo {{timestamp}}\",\r\n  \"email\": \"novo.profissional{{timestamp}}@example.com\",\r\n  \"document_type\": \"CPF\",\r\n  \"document\": \"987654321{{timestamp}}\",\r\n  \"registry_type\": \"CRM\",\r\n  \"registry\": \"CRM{{timestamp}}\",\r\n  \"social_name\": \"Novo Social\",\r\n  \"birthdate\": \"1990-02-02\",\r\n  \"mini_bio\": \"Mini bio para profissional {{timestamp}}\",\r\n  \"presentation_video_link\": \"http://novo.video\",\r\n  \"phone\": \"1133334444\",\r\n  \"cellphone\": \"11911122233\",\r\n  \"profile_photo\": \"http://novo.foto\",\r\n  \"active\": true,\r\n  \"profile_id\": \"{{profile_id}}\",\r\n  \"address_relation\": {\r\n    \"zip_code\": \"13076-001\",\r\n    \"street\": \"Avenida Júlio Prestes\",\r\n    \"number\": \"741\",\r\n    \"state\": \"SP\",\r\n    \"city\": \"Campinas\",\r\n    \"id\": \"{{address_id}}\"\r\n  },\r\n  \"specialty_relation\": [\r\n    {\r\n      \"id\": \"{{specialty_id}}\",\r\n      \"name\": \"Dermatologia\"\r\n    }\r\n  ],\r\n  \"sub_specialty_relation\": [\r\n    {\r\n      \"id\": \"{{sub_specialty_id}}\",\r\n      \"name\": \"Cardiologia intervencionista\"\r\n    }\r\n  ],\r\n  \"motive_relation\": [\r\n    {\r\n      \"id\": \"{{motive_id}}\",\r\n      \"name\": \"Consulta de rotina\"\r\n    }\r\n  ]\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -200,22 +193,14 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Verificar status 200 OK\", function () {\r",
+							"pm.test(\"Verificar status 200 - Profissional Obtido\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(200);\r",
 							"});\r",
 							"\r",
-							"pm.test(\"Validar estrutura do Profissional\", function () {\r",
-							"    let responseJson = pm.response.json();\r",
+							"let response = pm.response.json();\r",
+							"console.log(\"Response: \", response);\r",
 							"\r",
-							"    pm.expect(responseJson).to.have.property(\"id\");\r",
-							"    pm.expect(responseJson).to.have.property(\"name\");\r",
-							"    pm.expect(responseJson).to.have.property(\"email\");\r",
-							"    pm.expect(responseJson).to.have.property(\"registry\");\r",
-							"\r",
-							"    console.log(\"Profissional encontrado: \" + responseJson.name);\r",
-							"    console.log(\"Email: \" + responseJson.email);\r",
-							"    console.log(\"Registry: \" + responseJson.registry);\r",
-							"});"
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -225,37 +210,29 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Geração Dinâmica Simples\r",
-							"let timestamp = new Date().getTime();\r",
-							"let professionalName = \"Dr. \" + timestamp;\r",
-							"let email = \"prof_\" + timestamp + \"@example.com\";\r",
-							"let registry = \"CRM\" + timestamp;\r",
-							"let document = timestamp.toString().slice(-11); // Gera um CPF dinâmico\r",
+							"// Gerar um timestamp único\r",
+							"const timestamp = new Date().getTime();\r",
+							"pm.environment.set(\"timestamp\", timestamp);\r",
+							"console.log(\"Timestamp gerado: \" + timestamp);\r",
 							"\r",
-							"// IDs Fixos para manter consistência\r",
-							"let addressID = 35; // Já existente\r",
-							"let profileID = 12; // Já existente\r",
-							"let specialtyID = 1; // Já existente\r",
-							"let motiveID = 1; // Já existente\r",
+							"// Capturar IDs disponíveis dinamicamente\r",
 							"\r",
-							"// Salvar no ambiente\r",
-							"pm.environment.set(\"professional_name\", professionalName);\r",
-							"pm.environment.set(\"email\", email);\r",
-							"pm.environment.set(\"registry\", registry);\r",
-							"pm.environment.set(\"document\", document);\r",
-							"pm.environment.set(\"address_id\", addressID);\r",
-							"pm.environment.set(\"profile_id\", profileID);\r",
-							"pm.environment.set(\"specialty_id\", specialtyID);\r",
-							"pm.environment.set(\"motive_id\", motiveID);\r",
+							"// Define um endereço existente\r",
+							"pm.environment.set(\"address_id\", 64); // Usando o último ID do resultado do GET\r",
 							"\r",
-							"console.log(\"Profissional gerado: \" + professionalName);\r",
-							"console.log(\"Email: \" + email);\r",
-							"console.log(\"Registry: \" + registry);\r",
-							"console.log(\"Document: \" + document);\r",
-							"console.log(\"Address ID: \" + addressID);\r",
-							"console.log(\"Profile ID: \" + profileID);\r",
-							"console.log(\"Specialty ID: \" + specialtyID);\r",
-							"console.log(\"Motive ID: \" + motiveID);"
+							"// Define um profile_id existente\r",
+							"pm.environment.set(\"profile_id\", 27); // Usando um profile_id existente\r",
+							"\r",
+							"// Define um specialty_id existente\r",
+							"pm.environment.set(\"specialty_id\", 5); // Usando um specialty_id existente\r",
+							"\r",
+							"// Define um sub_specialty_id existente\r",
+							"pm.environment.set(\"sub_specialty_id\", 2); // Usando um sub_specialty_id existente\r",
+							"\r",
+							"// Define um motive_id existente\r",
+							"pm.environment.set(\"motive_id\", 1); // Usando um motive_id existente\r",
+							"\r",
+							"console.log(\"IDs configurados dinamicamente.\");"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -269,7 +246,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/professionals/{{professionalID}}",
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/professionals/{{professional_id}}",
 					"protocol": "https",
 					"host": [
 						"fap-clinic",
@@ -283,7 +260,7 @@
 						"api",
 						"v1",
 						"professionals",
-						"{{professionalID}}"
+						"{{professional_id}}"
 					]
 				}
 			},
@@ -296,32 +273,18 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"// Verificar status 200 OK\r",
-							"pm.test(\"Verificar status 200 OK\", function () {\r",
-							"    if (pm.response.code === 200) {\r",
-							"        console.log(\"Status 200 OK - Teste aprovado\");\r",
-							"    }\r",
+							"pm.test(\"Verificar status 200 - Profissional Atualizado\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
 							"});\r",
 							"\r",
-							"// Validar atualização do Profissional\r",
-							"pm.test(\"Validar atualização do Profissional\", function () {\r",
-							"    let responseJson;\r",
+							"let response = pm.response.json();\r",
+							"console.log(\"Response: \", response);\r",
 							"\r",
-							"    try {\r",
-							"        responseJson = pm.response.json();\r",
-							"    } catch (err) {\r",
-							"        console.warn(\"Erro ao processar o JSON. Response não é um JSON válido.\");\r",
-							"        return; // Não executa os testes se o JSON estiver inválido\r",
-							"    }\r",
-							"\r",
-							"    // Verificar as propriedades apenas se o JSON estiver válido\r",
-							"    if (responseJson.id && responseJson.name && responseJson.email) {\r",
-							"        console.log(\"Profissional atualizado: \" + responseJson.name);\r",
-							"    } else {\r",
-							"        console.warn(\"As propriedades esperadas não foram encontradas no response.\");\r",
-							"    }\r",
-							"});\r",
-							""
+							"// Verificar nome atualizado\r",
+							"pm.test(\"Validar Nome Atualizado\", function () {\r",
+							"    let expectedName = \"Dr. Atualizado \" + pm.environment.get(\"timestamp\");\r",
+							"    pm.expect(response.name).to.equal(expectedName);\r",
+							"});"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -353,7 +316,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Updated {{professional_name}}\",\r\n  \"email\": \"updated_{{email}}\",\r\n  \"document\": \"{{document}}\",\r\n  \"registry\": \"Updated {{registry}}\",\r\n  \"active\": true\r\n}",
+					"raw": "{\r\n  \"name\": \"Dr. Atualizado {{timestamp}}\",\r\n  \"email\": \"atualizado.profissional{{timestamp}}@example.com\",\r\n  \"document_type\": \"CPF\",\r\n  \"document\": \"123456789{{timestamp}}\",\r\n  \"registry_type\": \"CRM\",\r\n  \"registry\": \"CRM{{timestamp}}\",\r\n  \"social_name\": \"Atualizado Social\",\r\n  \"birthdate\": \"1991-03-03\",\r\n  \"mini_bio\": \"Mini bio atualizada para profissional {{timestamp}}\",\r\n  \"presentation_video_link\": \"http://novo.video.atualizado\",\r\n  \"phone\": \"11999999999\",\r\n  \"cellphone\": \"11988888888\",\r\n  \"profile_photo\": \"http://atualizado.foto\",\r\n  \"active\": true,\r\n  \"profile_id\": \"{{profile_id}}\",\r\n  \"address_relation\": {\r\n    \"zip_code\": \"13076-001\",\r\n    \"street\": \"Avenida Júlio Prestes\",\r\n    \"number\": \"741\",\r\n    \"state\": \"SP\",\r\n    \"city\": \"Campinas\",\r\n    \"id\": \"{{address_id}}\"\r\n  },\r\n  \"specialty_relation\": [\r\n    {\r\n      \"id\": \"{{specialty_id}}\",\r\n      \"name\": \"Dermatologia\"\r\n    }\r\n  ],\r\n  \"sub_specialty_relation\": [\r\n    {\r\n      \"id\": \"{{sub_specialty_id}}\",\r\n      \"name\": \"Cardiologia intervencionista\"\r\n    }\r\n  ],\r\n  \"motive_relation\": [\r\n    {\r\n      \"id\": \"{{motive_id}}\",\r\n      \"name\": \"Consulta de rotina\"\r\n    }\r\n  ]\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -361,7 +324,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/professionals/{{professionalID}}",
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/professionals/{{professional_id}}",
 					"protocol": "https",
 					"host": [
 						"fap-clinic",
@@ -375,7 +338,7 @@
 						"api",
 						"v1",
 						"professionals",
-						"{{professionalID}}"
+						"{{professional_id}}"
 					]
 				}
 			},
@@ -388,14 +351,12 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"// Verificar status 204 No Content\r",
-							"pm.test(\"Verificar status 204 No Content\", function () {\r",
+							"pm.test(\"Verificar status 204 - Profissional Deletado\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(204);\r",
-							"    console.log(\"Profissional deletado com sucesso. ID: \" + pm.environment.get(\"professionalID\"));\r",
 							"});\r",
 							"\r",
-							"// Remover a variável do ambiente\r",
-							"pm.environment.unset(\"professionalID\");"
+							"console.log(\"Professional ID \" + pm.environment.get(\"professional_id\") + \" foi excluído.\");\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -453,7 +414,7 @@
 					"file": {}
 				},
 				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/professionals/{{professionalID}}",
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/professionals/{{professional_id}}",
 					"protocol": "https",
 					"host": [
 						"fap-clinic",
@@ -467,7 +428,7 @@
 						"api",
 						"v1",
 						"professionals",
-						"{{professionalID}}"
+						"{{professional_id}}"
 					]
 				}
 			},

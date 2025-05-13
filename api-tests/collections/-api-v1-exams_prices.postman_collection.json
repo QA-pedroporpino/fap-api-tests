@@ -30,6 +30,13 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
+							"// Resetar IDs antes da criação\r",
+							"pm.environment.unset(\"price_id\");\r",
+							"pm.environment.unset(\"exam_id\");\r",
+							"pm.environment.unset(\"table_price_id\");\r",
+							"pm.environment.unset(\"timestamp\");\r",
+							"\r",
+							"console.log(\"IDs e Timestamp resetados.\");\r",
 							""
 						],
 						"type": "text/javascript",
@@ -37,12 +44,24 @@
 					}
 				}
 			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
 				"auth": {
 					"type": "noauth"
 				},
 				"method": "GET",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"table_price_id\": {{table_price_id}},\r\n  \"exam_id\": {{exam_id}},\r\n  \"title\": \"Consulta com Exames {{timestamp}}\",\r\n  \"sla\": 72,\r\n  \"price\": 350\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
 					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/exam_prices",
 					"protocol": "https",
@@ -70,15 +89,20 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 201\", function () {\r",
+							"pm.test(\"Verificar status 201 - Preço de Exame Criado\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(201);\r",
 							"});\r",
 							"\r",
-							"pm.test(\"Salvar ID do Preço de Exame Criado\", function () {\r",
-							"    let jsonData = pm.response.json();\r",
-							"    pm.environment.set(\"priceId\", jsonData.id);\r",
-							"    console.log(\"ID salvo: \" + jsonData.id);\r",
-							"});"
+							"let response = pm.response.json();\r",
+							"console.log(\"Response: \", response);\r",
+							"\r",
+							"// Capturar o ID do preço criado\r",
+							"if (response.id) {\r",
+							"    pm.environment.set(\"price_id\", response.id);\r",
+							"    console.log(\"Price ID salvo: \" + response.id);\r",
+							"} else {\r",
+							"    console.log(\"Price ID não encontrado na resposta.\");\r",
+							"}"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -88,13 +112,14 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Definir valores dinâmicos\r",
-							"let uniqueTimestamp = Date.now();\r",
-							"pm.environment.set(\"dynamicTablePriceId\", 1);\r",
-							"pm.environment.set(\"dynamicExamId\", 1);\r",
-							"pm.environment.set(\"dynamicTitle\", \"Consulta \" + uniqueTimestamp);\r",
-							"pm.environment.set(\"dynamicSla\", Math.floor(Math.random() * (72 - 24 + 1)) + 24); // SLA entre 24 e 72 horas\r",
-							"pm.environment.set(\"dynamicPrice\", Math.floor(Math.random() * (500 - 100 + 1)) + 100); // Preço entre 100 e 500"
+							"// Resetar IDs antes da criação\r",
+							"pm.environment.unset(\"price_id\");\r",
+							"pm.environment.unset(\"timestamp\");\r",
+							"\r",
+							"// Gerar um timestamp único para evitar duplicidades\r",
+							"const timestamp = new Date().getTime();\r",
+							"pm.environment.set(\"timestamp\", timestamp);\r",
+							"console.log(\"Timestamp gerado: \" + timestamp);"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -109,7 +134,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"table_price_id\": {{dynamicTablePriceId}},\r\n  \"exam_id\": {{dynamicExamId}},\r\n  \"title\": \"{{dynamicTitle}}\",\r\n  \"sla\": {{dynamicSla}},\r\n  \"price\": {{dynamicPrice}}\r\n}\r\n",
+					"raw": "{\r\n  \"table_price_id\": 2,\r\n  \"exam_id\": 6,\r\n  \"title\": \"Consulta com Exames Atualizada {{timestamp}}\",\r\n  \"sla\": 48,\r\n  \"price\": 450\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -143,13 +168,17 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 200\", function () {\r",
+							"pm.test(\"Verificar status 200 - Preço de Exame Obtido\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(200);\r",
 							"});\r",
 							"\r",
-							"pm.test(\"Verificar o campo 'title'\", function () {\r",
-							"    let jsonData = pm.response.json();\r",
-							"    pm.expect(jsonData.title).to.include(\"Consulta\");\r",
+							"let response = pm.response.json();\r",
+							"console.log(\"Response: \", response);\r",
+							"\r",
+							"// Verificar o título pelo timestamp\r",
+							"pm.test(\"Validar Título do Preço de Exame\", function () {\r",
+							"    let expectedTitle = \"Consulta com Exames \" + pm.environment.get(\"timestamp\");\r",
+							"    pm.expect(response.title).to.equal(expectedTitle);\r",
 							"});"
 						],
 						"type": "text/javascript",
@@ -160,10 +189,9 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Verificar se o ID foi salvo\r",
-							"pm.test(\"Verificar se o ID foi salvo\", function () {\r",
-							"    pm.expect(pm.environment.get(\"priceId\")).to.not.be.undefined;\r",
-							"});"
+							"if (!pm.environment.get(\"price_id\")) {\r",
+							"    throw new Error(\"Price ID não definido. Execute o POST primeiro.\");\r",
+							"}"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -177,7 +205,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/exam_prices/{{priceId}}",
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/exam_prices/{{price_id}}",
 					"protocol": "https",
 					"host": [
 						"fap-clinic",
@@ -191,7 +219,7 @@
 						"api",
 						"v1",
 						"exam_prices",
-						"{{priceId}}"
+						"{{price_id}}"
 					]
 				}
 			},
@@ -204,13 +232,17 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 200\", function () {\r",
+							"pm.test(\"Verificar status 200 - Preço de Exame Atualizado\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(200);\r",
 							"});\r",
 							"\r",
-							"pm.test(\"Verificar atualização do campo 'title'\", function () {\r",
-							"    let jsonData = pm.response.json();\r",
-							"    pm.expect(jsonData.title).to.include(\"Atualizada\");\r",
+							"let response = pm.response.json();\r",
+							"console.log(\"Response: \", response);\r",
+							"\r",
+							"// Verificar título atualizado\r",
+							"pm.test(\"Validar Título Atualizado\", function () {\r",
+							"    let expectedTitle = \"Consulta com Exames Atualizada \" + pm.environment.get(\"timestamp\");\r",
+							"    pm.expect(response.title).to.equal(expectedTitle);\r",
 							"});"
 						],
 						"type": "text/javascript",
@@ -221,17 +253,9 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Definir valores dinâmicos para atualização\r",
-							"let uniqueTimestamp = Date.now();\r",
-							"pm.environment.set(\"updatedTablePriceId\", 3);\r",
-							"pm.environment.set(\"updatedTitle\", \"Consulta Atualizada \" + uniqueTimestamp);\r",
-							"pm.environment.set(\"updatedSla\", Math.floor(Math.random() * (72 - 24 + 1)) + 24); // SLA entre 24 e 72 horas\r",
-							"pm.environment.set(\"updatedPrice\", Math.floor(Math.random() * (500 - 100 + 1)) + 100); // Preço entre 100 e 500\r",
-							"\r",
-							"// Verificar se o ID foi salvo\r",
-							"pm.test(\"Verificar se o ID foi salvo\", function () {\r",
-							"    pm.expect(pm.environment.get(\"priceId\")).to.not.be.undefined;\r",
-							"});"
+							"if (!pm.environment.get(\"price_id\")) {\r",
+							"    throw new Error(\"Price ID não definido. Execute o POST primeiro.\");\r",
+							"}"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -246,7 +270,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"table_price_id\": {{updatedTablePriceId}},\r\n  \"title\": \"{{updatedTitle}}\",\r\n  \"sla\": {{updatedSla}},\r\n  \"price\": {{updatedPrice}}\r\n}",
+					"raw": "{\r\n  \"table_price_id\": 2,\r\n  \"exam_id\": 6,\r\n  \"title\": \"Consulta com Exames Atualizada {{timestamp}}\",\r\n  \"sla\": 48,\r\n  \"price\": 450\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -254,7 +278,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/exam_prices/{{priceId}}",
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/exam_prices/{{price_id}}",
 					"protocol": "https",
 					"host": [
 						"fap-clinic",
@@ -268,7 +292,7 @@
 						"api",
 						"v1",
 						"exam_prices",
-						"{{priceId}}"
+						"{{price_id}}"
 					]
 				}
 			},
@@ -281,13 +305,12 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 204\", function () {\r",
+							"pm.test(\"Verificar status 204 - Preço de Exame Deletado\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(204);\r",
 							"});\r",
 							"\r",
-							"pm.test(\"Verificar exclusão\", function () {\r",
-							"    console.log(\"Preço de exame excluído: \" + pm.environment.get(\"priceId\"));\r",
-							"});"
+							"console.log(\"Price ID \" + pm.environment.get(\"price_id\") + \" foi excluído.\");\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -297,10 +320,9 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Verificar se o ID foi salvo\r",
-							"pm.test(\"Verificar se o ID foi salvo\", function () {\r",
-							"    pm.expect(pm.environment.get(\"priceId\")).to.not.be.undefined;\r",
-							"});"
+							"if (!pm.environment.get(\"price_id\")) {\r",
+							"    throw new Error(\"Price ID não definido. Execute o POST primeiro.\");\r",
+							"}"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -318,7 +340,7 @@
 					"file": {}
 				},
 				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/exam_prices/{{priceId}}\n",
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/exam_prices/{{price_id}}\n",
 					"protocol": "https",
 					"host": [
 						"fap-clinic",
@@ -332,7 +354,7 @@
 						"api",
 						"v1",
 						"exam_prices",
-						"{{priceId}}\n"
+						"{{price_id}}\n"
 					]
 				}
 			},

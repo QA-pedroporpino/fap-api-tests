@@ -90,20 +90,25 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Verificar status 201 Created\", function () {\r",
+							"pm.test(\"Verificar status 201 - Specialty Price Criado\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(201);\r",
 							"});\r",
 							"\r",
-							"pm.test(\"Salvar ID do Preço da Especialidade criado\", function () {\r",
-							"    let responseJson = pm.response.json();\r",
-							"    \r",
-							"    if (responseJson.id) {\r",
-							"        pm.environment.set(\"specialtyPriceID\", responseJson.id);\r",
-							"        console.log(\"Specialty Price ID salvo: \" + responseJson.id);\r",
-							"    } else {\r",
-							"        console.warn(\"ID do Preço da Especialidade não foi gerado.\");\r",
-							"    }\r",
-							"});"
+							"let response = pm.response.json();\r",
+							"console.log(\"Response: \", response);\r",
+							"\r",
+							"if (response.id) {\r",
+							"    pm.environment.set(\"specialtyPriceID\", response.id);\r",
+							"    console.log(\"Specialty Price ID salvo: \" + response.id);\r",
+							"} else {\r",
+							"    console.log(\"Specialty Price ID não encontrado.\");\r",
+							"}\r",
+							"\r",
+							"// Gerar um timestamp único para evitar duplicidades\r",
+							"const timestamp = new Date().getTime();\r",
+							"pm.environment.set(\"timestamp\", timestamp);\r",
+							"console.log(\"Timestamp gerado: \" + timestamp);\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -113,26 +118,16 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Geração Dinâmica de Dados\r",
-							"let timestamp = new Date().getTime();\r",
-							"let title = \"Consulta com Especialista \" + timestamp;\r",
-							"let price = Math.floor(Math.random() * 500) + 100; // Preço aleatório entre 100 e 600\r",
-							"let sla = 72; // SLA fixo para simplificação\r",
-							"let tablePriceID = 1; // Mantendo fixo para garantir criação\r",
-							"let specialtyID = 1; // Especialidade padrão\r",
+							"// Gerar um timestamp único\r",
+							"const timestamp = new Date().getTime();\r",
+							"pm.environment.set(\"timestamp\", timestamp);\r",
 							"\r",
-							"// Salvar no ambiente\r",
-							"pm.environment.set(\"title\", title);\r",
-							"pm.environment.set(\"price\", price);\r",
-							"pm.environment.set(\"sla\", sla);\r",
-							"pm.environment.set(\"table_price_id\", tablePriceID);\r",
-							"pm.environment.set(\"specialty_id\", specialtyID);\r",
+							"// Definir IDs para `table_price_id` e `specialty_id` - ajuste conforme o GET mais recente\r",
+							"pm.environment.set(\"table_price_id\", 1);  // Verificar se existe\r",
+							"pm.environment.set(\"specialty_id\", 1);    // Verificar se existe\r",
 							"\r",
-							"console.log(\"Título gerado: \" + title);\r",
-							"console.log(\"Preço: \" + price);\r",
-							"console.log(\"SLA: \" + sla);\r",
-							"console.log(\"Table Price ID: \" + tablePriceID);\r",
-							"console.log(\"Specialty ID: \" + specialtyID);"
+							"console.log(\"IDs configurados: table_price_id = \" + pm.environment.get(\"table_price_id\") + \" | specialty_id = \" + pm.environment.get(\"specialty_id\"));\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -147,7 +142,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"table_price_id\": {{table_price_id}},\r\n  \"specialty_id\": {{specialty_id}},\r\n  \"title\": \"{{title}}\",\r\n  \"sla\": {{sla}},\r\n  \"price\": {{price}}\r\n}",
+					"raw": "{\r\n  \"table_price_id\": 2,\r\n  \"specialty_id\": 1,\r\n  \"title\": \"Consulta com Especialista {{timestamp}}\",\r\n  \"sla\": 72,\r\n  \"price\": 350\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -235,19 +230,26 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Verificar status 200 OK\", function () {\r",
+							"pm.test(\"Verificar status 200 - Specialty Price Atualizado\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(200);\r",
 							"});\r",
 							"\r",
-							"pm.test(\"Validar atualização do Preço da Especialidade\", function () {\r",
-							"    let responseJson = pm.response.json();\r",
+							"let response = pm.response.json();\r",
+							"console.log(\"Response PUT: \", response);\r",
 							"\r",
-							"    pm.expect(responseJson).to.have.property(\"id\");\r",
-							"    pm.expect(responseJson).to.have.property(\"title\");\r",
-							"    pm.expect(responseJson.title).to.include(\"Atualizado_\");\r",
+							"// Validar ID atualizado\r",
+							"pm.test(\"Validar Specialty Price ID\", function () {\r",
+							"    pm.expect(response.id).to.equal(parseInt(pm.environment.get(\"specialtyPriceID\")));\r",
+							"});\r",
 							"\r",
-							"    console.log(\"Preço da Especialidade atualizado: \" + responseJson.title);\r",
-							"});"
+							"// Validar SLA e Preço Atualizados\r",
+							"pm.test(\"Verificar SLA Atualizado\", function () {\r",
+							"    pm.expect(response.sla).to.equal(48);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"console.log(\"PUT realizado com sucesso.\");\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -257,13 +259,12 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"let specialtyPriceID = pm.environment.get(\"specialtyPriceID\");\r",
+							"// Gerar timestamp para garantir dados únicos\r",
+							"const timestamp = new Date().getTime();\r",
+							"pm.environment.set(\"timestamp\", timestamp);\r",
 							"\r",
-							"if (!specialtyPriceID) {\r",
-							"    console.warn(\"specialtyPriceID não foi definido. Execute o POST primeiro para criar um Preço da Especialidade.\");\r",
-							"} else {\r",
-							"    console.log(\"Specialty Price ID para atualização: \" + specialtyPriceID);\r",
-							"}"
+							"console.log(\"Timestamp gerado para PUT: \" + timestamp);\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -278,7 +279,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"table_price_id\": {{table_price_id}},\r\n  \"title\": \"Atualizado_{{title}}\",\r\n  \"sla\": 48,\r\n  \"price\": 300\r\n}",
+					"raw": "{\r\n  \"table_price_id\": 2,\r\n  \"specialty_id\": 1,\r\n  \"title\": \"Consulta com Especialista Atualizada {{timestamp}}\",\r\n  \"sla\": 48,\r\n  \"price\": 450\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -360,7 +361,11 @@
 					"type": "noauth"
 				},
 				"method": "DELETE",
-				"body": {},
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
 				"url": {
 					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/specialty_prices/{{specialtyPriceID}}\n",
 					"protocol": "https",
