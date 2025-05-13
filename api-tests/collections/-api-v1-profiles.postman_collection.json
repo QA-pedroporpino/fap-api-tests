@@ -93,20 +93,52 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Verificar status 201 Created\", function () {\r",
+							"let response = pm.response.json();\r",
+							"if (response.id) {\r",
+							"    pm.environment.set(\"profileID\", response.id);\r",
+							"    console.log(\"Profile ID salvo: \" + response.id);\r",
+							"} else {\r",
+							"    console.log(\"Falha ao salvar o Profile ID\");\r",
+							"}\r",
+							"\r",
+							"pm.test(\"Response status code is 201\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(201);\r",
 							"});\r",
 							"\r",
-							"pm.test(\"Salvar ID do Profile criado\", function () {\r",
-							"    let responseJson = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Response time is less than 200ms\", function () {\r",
+							"  pm.expect(pm.response.responseTime).to.be.below(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Active field is present and has a boolean value\", function () {\r",
+							"    const responseData = pm.response.json();\r",
 							"    \r",
-							"    if (responseJson.id) {\r",
-							"        pm.environment.set(\"profileID\", responseJson.id);\r",
-							"        console.log(\"Profile ID salvo: \" + responseJson.id);\r",
-							"    } else {\r",
-							"        console.warn(\"ID do Profile não foi gerado.\");\r",
-							"    }\r",
-							"});"
+							"    pm.expect(responseData).to.have.property('active').that.is.a('boolean');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Clinic ID field is present and has a numerical value\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.have.property('clinic_id');\r",
+							"    pm.expect(responseData.clinic_id).to.be.a('number');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Clinic relation object is present and contains required fields\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.clinic_relation).to.exist;\r",
+							"    pm.expect(responseData.clinic_relation.date_created).to.exist;\r",
+							"    pm.expect(responseData.clinic_relation.date_updated).to.exist;\r",
+							"    pm.expect(responseData.clinic_relation.id).to.exist;\r",
+							"    pm.expect(responseData.clinic_relation.name).to.exist;\r",
+							"    pm.expect(responseData.clinic_relation.preferred_network).to.exist;\r",
+							"});\r",
+							"\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -116,28 +148,10 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Geração Dinâmica Simples\r",
-							"let timestamp = new Date().getTime();\r",
-							"let profileName = \"Profile_\" + timestamp;\r",
-							"let profileType = \"MANAGER\"; // Pode ser \"PROFESSIONAL\" ou \"MANAGER\"\r",
-							"let clinicID = 1; // Mantendo fixo para simplificar\r",
-							"\r",
-							"// Permissões Dinâmicas\r",
-							"let permissions = [\r",
-							"    \"SCHEDULE_VIEW\",\r",
-							"    \"APPOINT_CONSULTATION\"\r",
-							"];\r",
-							"\r",
-							"// Salvar no ambiente\r",
-							"pm.environment.set(\"profile_name\", profileName);\r",
-							"pm.environment.set(\"profile_type\", profileType);\r",
-							"pm.environment.set(\"clinic_id\", clinicID);\r",
-							"pm.environment.set(\"permissions\", JSON.stringify(permissions));\r",
-							"\r",
-							"console.log(\"Profile gerado: \" + profileName);\r",
-							"console.log(\"Tipo: \" + profileType);\r",
-							"console.log(\"Clinic ID: \" + clinicID);\r",
-							"console.log(\"Permissões: \" + permissions.join(\", \"));"
+							"const timestamp = new Date().getTime();\r",
+							"pm.environment.set(\"timestamp\", timestamp);\r",
+							"console.log(\"Timestamp gerado: \" + timestamp);\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -152,7 +166,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"{{profile_name}}\",\r\n  \"type\": \"{{profile_type}}\",\r\n  \"permissions\": {{permissions}},\r\n  \"clinic_id\": {{clinic_id}}\r\n}",
+					"raw": "{\r\n  \"name\": \"Profissional {{timestamp}}\",\r\n  \"type\": \"PROFESSIONAL\",\r\n  \"permissions\": [\r\n    \"SCHEDULE_VIEW\",\r\n    \"APPOINT_CONSULTATION\"\r\n  ],\r\n  \"clinic_id\": 7\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -313,7 +327,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Updated_{{profile_name}}\",\r\n  \"type\": \"{{profile_type}}\",\r\n  \"permissions\": [\"DASHBOARD_MANAGER\", \"CLINIC_SETUP\"],\r\n  \"clinic_id\": {{clinic_id}}\r\n}",
+					"raw": "{\r\n  \"name\": \"{{profileName}}\",\r\n  \"type\": \"PROFESSIONAL\",\r\n  \"permissions\": [\r\n    \"SCHEDULE_VIEW\",\r\n    \"APPOINT_CONSULTATION\"\r\n  ],\r\n  \"clinic_id\": 7\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"

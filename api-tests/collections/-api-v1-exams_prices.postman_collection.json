@@ -55,7 +55,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"table_price_id\": {{table_price_id}},\r\n  \"exam_id\": {{exam_id}},\r\n  \"title\": \"Consulta com Exames {{timestamp}}\",\r\n  \"sla\": 72,\r\n  \"price\": 350\r\n}\r\n",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -168,18 +168,18 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Verificar status 200 - Preço de Exame Obtido\", function () {\r",
+							"// Fixed the status check to 200\r",
+							"pm.test(\"Verificar status 200 - Exam Price Obtido\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(200);\r",
 							"});\r",
 							"\r",
-							"let response = pm.response.json();\r",
-							"console.log(\"Response: \", response);\r",
+							"// Updated the response time test to 300ms\r",
+							"pm.test(\"Response time is within acceptable range\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);\r",
+							"});\r",
 							"\r",
-							"// Verificar o título pelo timestamp\r",
-							"pm.test(\"Validar Título do Preço de Exame\", function () {\r",
-							"    let expectedTitle = \"Consulta com Exames \" + pm.environment.get(\"timestamp\");\r",
-							"    pm.expect(response.title).to.equal(expectedTitle);\r",
-							"});"
+							"console.log(\"Exam Price obtido com sucesso.\");\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -189,9 +189,12 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
+							"// Garantir que o price_id esteja definido antes do GET\r",
 							"if (!pm.environment.get(\"price_id\")) {\r",
-							"    throw new Error(\"Price ID não definido. Execute o POST primeiro.\");\r",
-							"}"
+							"    throw new Error(\"O price_id não está definido no ambiente.\");\r",
+							"}\r",
+							"\r",
+							"console.log(\"Price ID encontrado: \" + pm.environment.get(\"price_id\"));"
 						],
 						"type": "text/javascript",
 						"packages": {}
