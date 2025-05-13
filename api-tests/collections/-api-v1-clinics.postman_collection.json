@@ -62,20 +62,41 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Verificar status 201 Created\", function () {\r",
+							"pm.test(\"Verificar status 201 - Clínica Criada\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(201);\r",
 							"});\r",
 							"\r",
-							"pm.test(\"Salvar ID da clínica criada\", function () {\r",
-							"    let responseJson = pm.response.json();\r",
+							"let response = pm.response.json();\r",
+							"pm.environment.set(\"clinic_id\", response.id);\r",
+							"console.log(\"Clinic ID salvo: \" + response.id);\r",
 							"\r",
-							"    // Verificar se o ID foi gerado\r",
-							"    pm.expect(responseJson).to.have.property(\"id\");\r",
+							"// Capturar o address_id\r",
+							"if (response.addresses_set.length > 0) {\r",
+							"    pm.environment.set(\"address_id\", response.addresses_set[0].id);\r",
+							"    console.log(\"Address ID salvo: \" + response.addresses_set[0].id);\r",
+							"}\r",
 							"\r",
-							"    // Salvar o ID em uma variável\r",
-							"    pm.environment.set(\"clinicID\", responseJson.id);\r",
-							"    console.log(\"Novo clinic ID criado: \" + responseJson.id);\r",
-							"});"
+							"// Capturar o affiliated_address_id\r",
+							"if (response.affiliated_addresses_set.length > 0) {\r",
+							"    pm.environment.set(\"affiliated_address_id\", response.affiliated_addresses_set[0].id);\r",
+							"    console.log(\"Affiliated Address ID salvo: \" + response.affiliated_addresses_set[0].id);\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Resetar IDs antes da criação\r",
+							"pm.environment.unset(\"clinic_id\");\r",
+							"pm.environment.unset(\"address_id\");\r",
+							"pm.environment.unset(\"affiliated_address_id\");\r",
+							"pm.environment.unset(\"billing_id\");\r",
+							"console.log(\"IDs resetados.\");\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -90,7 +111,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Clinica X\",\r\n  \"profile\": \"manager\",\r\n  \"preferred_network\": true,\r\n  \"clinic_services_relation\": [\r\n    {\r\n      \"title\": \"Atendimento Geral\"\r\n    }\r\n  ],\r\n  \"clinic_service_times_relation\": [\r\n    {\r\n      \"start_time\": \"08:00:00\",\r\n      \"end_time\": \"18:00:00\",\r\n      \"days\": \"Seg-Sex\"\r\n    }\r\n  ],\r\n  \"clinic_offices_relation\": [\r\n    {\r\n      \"contact_email\": \"office@clinic.com\",\r\n      \"contect_cellphone\": \"111222333\",\r\n      \"contact_phone\": \"444555666\",\r\n      \"address_relation\": {\r\n        \"zip_code\": \"01001-000\",\r\n        \"street\": \"Rua A\",\r\n        \"number\": \"100\",\r\n        \"state\": \"SP\",\r\n        \"city\": \"São Paulo\"\r\n      }\r\n    }\r\n  ],\r\n  \"clinic_main_professionals_relation\": [\r\n    {\r\n      \"name\": \"Dr. Fulano\",\r\n      \"cpf\": \"00011122233\",\r\n      \"crm\": \"CRM1234\",\r\n      \"state\": \"SP\",\r\n      \"cellphone\": \"999888777\",\r\n      \"email\": \"dr@clinic.com\"\r\n    }\r\n  ],\r\n  \"clinic_languages_relation\": [\r\n    {\r\n      \"title\": \"Português\"\r\n    }\r\n  ],\r\n  \"clinic_infos_relation\": [\r\n    {\r\n      \"contact_email\": \"info@clinic.com\",\r\n      \"contact_phone\": \"555666777\",\r\n      \"contact_cellphone\": \"888999000\",\r\n      \"address_relation\": {\r\n        \"zip_code\": \"01002-000\",\r\n        \"street\": \"Rua B\",\r\n        \"number\": \"200\",\r\n        \"state\": \"SP\",\r\n        \"city\": \"São Paulo\"\r\n      }\r\n    }\r\n  ],\r\n  \"clinic_documents_relation\": [\r\n    {\r\n      \"document_type\": \"CNES\",\r\n      \"end_date\": \"2023-01-01\",\r\n      \"url\": \"http://...\",\r\n      \"filename\": \"doc.pdf\"\r\n    }\r\n  ],\r\n  \"clinic_classifications_relation\": [\r\n    {\r\n      \"title\": \"Classe A\"\r\n    }\r\n  ],\r\n  \"clinic_billings_relation\": [\r\n    {\r\n      \"payment_type\": \"BOLETO\",\r\n      \"account_holder\": \"Clinica X\",\r\n      \"bank\": \"Banco Y\",\r\n      \"agency\": \"0001\",\r\n      \"contact_name\": \"Financeiro\",\r\n      \"contact_email\": \"fin@clinic.com\",\r\n      \"contact_cellphone\": \"222333444\",\r\n      \"contact_phone\": \"333444555\"\r\n    }\r\n  ]\r\n}",
+					"raw": "{\r\n  \"name\": \"Clinica X Dinâmica\",\r\n  \"profile\": \"manager\",\r\n  \"preferred_network\": true,\r\n  \"clinic_addresses_relation\": {\r\n    \"street\": \"Rua C\",\r\n    \"number\": \"300\",\r\n    \"neighborhood\": \"Jardim Paulista\",\r\n    \"complement\": \"Fundos\",\r\n    \"reference_point\": \"Próximo ao shopping\",\r\n    \"type_address\": \"Comercial\",\r\n    \"zip_code\": \"01003-000\",\r\n    \"city\": \"São Paulo\",\r\n    \"state\": \"SP\"\r\n  },\r\n  \"clinic_affiliated_addresses_relation\": [\r\n    {\r\n      \"street\": \"Rua D\",\r\n      \"number\": \"400\",\r\n      \"neighborhood\": \"Jardim Paulista\",\r\n      \"complement\": \"Fundos\",\r\n      \"reference_point\": \"Próximo ao shopping\",\r\n      \"type_address\": \"Comercial\",\r\n      \"zip_code\": \"01004-000\",\r\n      \"city\": \"São Paulo\",\r\n      \"state\": \"SP\",\r\n      \"email\": \"affiliated@clinic.com\"\r\n    }\r\n  ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -124,17 +145,41 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status 200 OK\", function () {\r",
+							"pm.test(\"Verificar status 200 - Clínica Obtida\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(200);\r",
 							"});\r",
 							"\r",
-							"// Garantir que o clinicID esteja salvo\r",
-							"let responseJson = pm.response.json();\r",
-							"if (responseJson.id) {\r",
-							"    pm.environment.set(\"clinicID\", responseJson.id);\r",
-							"    console.log(\"Clinic ID atualizado: \" + responseJson.id);\r",
-							"} else {\r",
-							"    console.log(\"Clinic ID não encontrado no response.\");\r",
+							"let response = pm.response.json();\r",
+							"\r",
+							"// Validar Clinic ID\r",
+							"pm.test(\"Validar Clinic ID\", function () {\r",
+							"    pm.expect(response.id).to.equal(parseInt(pm.environment.get(\"clinic_id\")));\r",
+							"});\r",
+							"\r",
+							"// Validar Address ID\r",
+							"pm.test(\"Validar Address ID\", function () {\r",
+							"    let addressId = pm.environment.get(\"address_id\");\r",
+							"    let addressFound = response.addresses_set.some(addr => addr.id === parseInt(addressId));\r",
+							"    pm.expect(addressFound).to.be.true;\r",
+							"});\r",
+							"\r",
+							"// Validar Affiliated Address ID\r",
+							"pm.test(\"Validar Affiliated Address ID\", function () {\r",
+							"    let affiliatedAddressId = pm.environment.get(\"affiliated_address_id\");\r",
+							"    let affiliatedAddressFound = response.affiliated_addresses_set.some(addr => addr.id === parseInt(affiliatedAddressId));\r",
+							"    pm.expect(affiliatedAddressFound).to.be.true;\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"if (!pm.environment.get(\"clinic_id\")) {\r",
+							"    throw new Error(\"Clinic ID não definido. Execute o POST primeiro.\");\r",
 							"}"
 						],
 						"type": "text/javascript",
@@ -149,7 +194,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clinics/{{clinicID}}",
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clinics/{{clinic_id}}",
 					"protocol": "https",
 					"host": [
 						"fap-clinic",
@@ -163,7 +208,7 @@
 						"api",
 						"v1",
 						"clinics",
-						"{{clinicID}}"
+						"{{clinic_id}}"
 					]
 				}
 			},
@@ -176,16 +221,26 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"if (!pm.environment.get(\"clinicID\")) {\r",
-							"    console.log(\"clinicID não setado. Execute o POST para criar uma nova clínica.\");\r",
-							"    postman.setNextRequest(null); // Cancela o PUT se o clinicID não existir\r",
-							"} else {\r",
-							"    console.log(\"Profile ID não encontrado no response.\");\r",
-							"}\r",
-							"\r",
-							"pm.test(\"Verificar status 200 OK\", function () {\r",
+							"pm.test(\"Verificar status 200 - Clínica Atualizada\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(200);\r",
-							"});"
+							"});\r",
+							"\r",
+							"let response = pm.response.json();\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"if (!pm.environment.get(\"address_id\")) {\r",
+							"    throw new Error(\"Address ID não definido. Execute o POST e GET primeiro.\");\r",
+							"}"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -200,7 +255,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Clinica X Atualizada\",\r\n  \"profile\": \"specialist\",\r\n  \"preferred_network\": false,\r\n  \"clinic_services_relation\": [\r\n    {\r\n      \"title\": \"Atendimento Avançado\"\r\n    }\r\n  ],\r\n  \"clinic_service_times_relation\": [\r\n    {\r\n      \"start_time\": \"09:00:00\",\r\n      \"end_time\": \"19:00:00\",\r\n      \"days\": \"Seg-Sab\"\r\n    }\r\n  ],\r\n  \"clinic_offices_relation\": [\r\n    {\r\n      \"contact_email\": \"newoffice@clinic.com\",\r\n      \"contect_cellphone\": \"333444555\",\r\n      \"contact_phone\": \"777888999\",\r\n      \"address_relation\": {\r\n        \"zip_code\": \"02003-000\",\r\n        \"street\": \"Rua C\",\r\n        \"number\": \"300\",\r\n        \"state\": \"RJ\",\r\n        \"city\": \"Rio de Janeiro\"\r\n      }\r\n    }\r\n  ],\r\n  \"clinic_main_professionals_relation\": [\r\n    {\r\n      \"name\": \"Dr. Ciclano\",\r\n      \"cpf\": \"11122233344\",\r\n      \"crm\": \"CRM5678\",\r\n      \"state\": \"RJ\",\r\n      \"cellphone\": \"666555444\",\r\n      \"email\": \"drciclano@clinic.com\"\r\n    }\r\n  ],\r\n  \"clinic_languages_relation\": [\r\n    {\r\n      \"title\": \"Inglês\"\r\n    }\r\n  ],\r\n  \"clinic_infos_relation\": [\r\n    {\r\n      \"contact_email\": \"info_updated@clinic.com\",\r\n      \"contact_phone\": \"666777888\",\r\n      \"contact_cellphone\": \"999000111\",\r\n      \"address_relation\": {\r\n        \"zip_code\": \"02004-000\",\r\n        \"street\": \"Rua D\",\r\n        \"number\": \"400\",\r\n        \"state\": \"RJ\",\r\n        \"city\": \"Rio de Janeiro\"\r\n      }\r\n    }\r\n  ],\r\n  \"clinic_documents_relation\": [\r\n    {\r\n      \"document_type\": \"CNES\",\r\n      \"end_date\": \"2024-12-31\",\r\n      \"url\": \"http://new-url.com\",\r\n      \"filename\": \"new_doc.pdf\"\r\n    }\r\n  ],\r\n  \"clinic_classifications_relation\": [\r\n    {\r\n      \"title\": \"Classe B\"\r\n    }\r\n  ],\r\n  \"clinic_billings_relation\": [\r\n    {\r\n      \"payment_type\": \"PIX\",\r\n      \"account_holder\": \"Clinica X Atualizada\",\r\n      \"bank\": \"Banco Z\",\r\n      \"agency\": \"0002\",\r\n      \"contact_name\": \"Novo Financeiro\",\r\n      \"contact_email\": \"financeiro@clinic.com\",\r\n      \"contact_cellphone\": \"888999000\",\r\n      \"contact_phone\": \"111222333\"\r\n    }\r\n  ]\r\n}\r\n",
+					"raw": "{\r\n  \"name\": \"Clinica X Dinâmica atualizada\",\r\n  \"profile\": \"manager\",\r\n  \"preferred_network\": true,\r\n  \"clinic_addresses_relation\": {\r\n    \"street\": \"Rua C\",\r\n    \"number\": \"300\",\r\n    \"neighborhood\": \"Jardim Paulista\",\r\n    \"complement\": \"Fundos\",\r\n    \"reference_point\": \"Próximo ao shopping\",\r\n    \"type_address\": \"Comercial\",\r\n    \"zip_code\": \"01003-000\",\r\n    \"city\": \"São Paulo\",\r\n    \"state\": \"SP\"\r\n  },\r\n  \"clinic_affiliated_addresses_relation\": [\r\n    {\r\n      \"street\": \"Rua D\",\r\n      \"number\": \"400\",\r\n      \"neighborhood\": \"Jardim Paulista\",\r\n      \"complement\": \"Fundos\",\r\n      \"reference_point\": \"Próximo ao shopping\",\r\n      \"type_address\": \"Comercial\",\r\n      \"zip_code\": \"01004-000\",\r\n      \"city\": \"São Paulo\",\r\n      \"state\": \"SP\",\r\n      \"email\": \"affiliated@clinic.com\"\r\n    }\r\n  ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -208,7 +263,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clinics/{{clinicID}}\n",
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clinics/{{clinic_id}}",
 					"protocol": "https",
 					"host": [
 						"fap-clinic",
@@ -222,7 +277,7 @@
 						"api",
 						"v1",
 						"clinics",
-						"{{clinicID}}\n"
+						"{{clinic_id}}"
 					]
 				}
 			},
@@ -235,15 +290,10 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"if (!pm.environment.get(\"clinicID\")) {\r",
-							"    console.log(\"clinicID não setado. Execute o POST para criar uma nova clínica.\");\r",
-							"    postman.setNextRequest(null); // Cancela o DELETE se o clinicID não existir\r",
-							"}\r",
-							"\r",
-							"pm.test(\"Verificar status 204 No Content\", function () {\r",
+							"// Verificar status 204 - Clínica Excluída\r",
+							"pm.test(\"Verificar status 204 - Clínica Excluída\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(204);\r",
-							"});\r",
-							""
+							"});"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -256,9 +306,12 @@
 				},
 				"method": "DELETE",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clinics/{{clinicID}}\n",
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clinics/{{clinic_id}}\n",
 					"protocol": "https",
 					"host": [
 						"fap-clinic",
@@ -272,7 +325,7 @@
 						"api",
 						"v1",
 						"clinics",
-						"{{clinicID}}\n"
+						"{{clinic_id}}\n"
 					]
 				}
 			},
