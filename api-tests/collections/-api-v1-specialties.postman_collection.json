@@ -311,7 +311,10 @@
 				},
 				"method": "DELETE",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
 				"url": {
 					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/specialties/{{specialtyID}}",
 					"protocol": "https",

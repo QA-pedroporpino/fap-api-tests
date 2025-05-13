@@ -62,21 +62,20 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Verificar status 201 Created\", function () {\r",
+							"pm.test(\"Verificar status 201 - Manager Criado\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(201);\r",
 							"});\r",
 							"\r",
-							"pm.test(\"Salvar ID do Manager criado\", function () {\r",
-							"    let responseJson = pm.response.json();\r",
-							"    \r",
-							"    if (responseJson.id) {\r",
-							"        pm.environment.set(\"managerID\", responseJson.id);\r",
-							"        console.log(\"Manager ID salvo: \" + responseJson.id);\r",
-							"    } else {\r",
-							"        console.log(\"Erro: ID do Manager não foi gerado.\");\r",
-							"    }\r",
-							"});\r",
-							""
+							"let response = pm.response.json();\r",
+							"console.log(\"Response: \", response);\r",
+							"\r",
+							"// Capturar o ID do manager criado\r",
+							"if (response.id) {\r",
+							"    pm.environment.set(\"manager_id\", response.id);\r",
+							"    console.log(\"Manager ID salvo: \" + response.id);\r",
+							"} else {\r",
+							"    console.log(\"Manager ID não encontrado na resposta.\");\r",
+							"}"
 						],
 						"type": "text/javascript",
 						"packages": {}
