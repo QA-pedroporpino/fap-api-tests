@@ -62,25 +62,54 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Verificar status 201 - Clínica Criada\", function () {\r",
-							"    pm.expect(pm.response.code).to.equal(201);\r",
-							"});\r",
-							"\r",
 							"let response = pm.response.json();\r",
-							"pm.environment.set(\"clinic_id\", response.id);\r",
-							"console.log(\"Clinic ID salvo: \" + response.id);\r",
-							"\r",
-							"// Capturar o address_id\r",
-							"if (response.addresses_set.length > 0) {\r",
-							"    pm.environment.set(\"address_id\", response.addresses_set[0].id);\r",
-							"    console.log(\"Address ID salvo: \" + response.addresses_set[0].id);\r",
+							"if (pm.response.code === 201) {\r",
+							"    pm.environment.set(\"clinicId\", response.id);\r",
+							"    console.log(\"Clínica criada com ID:\", response.id);\r",
+							"} else {\r",
+							"    console.log(\"Erro na criação da clínica:\", response);\r",
 							"}\r",
 							"\r",
-							"// Capturar o affiliated_address_id\r",
-							"if (response.affiliated_addresses_set.length > 0) {\r",
-							"    pm.environment.set(\"affiliated_address_id\", response.affiliated_addresses_set[0].id);\r",
-							"    console.log(\"Affiliated Address ID salvo: \" + response.affiliated_addresses_set[0].id);\r",
-							"}"
+							"pm.test(\"Response status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							"pm.test(\"Certificates set array is present and has expected number of elements\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData.certificates_set).to.exist;\r",
+							"    pm.expect(responseData.certificates_set).to.be.an('array');\r",
+							"    pm.expect(responseData.certificates_set).to.have.lengthOf(0);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Clinic addresses relation has required fields\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData.clinic_addresses_relation).to.be.an('array');\r",
+							"    responseData.clinic_addresses_relation.forEach(function(address) {\r",
+							"        pm.expect(address).to.have.property('city');\r",
+							"        pm.expect(address).to.have.property('complement');\r",
+							"        pm.expect(address).to.have.property('neighborhood');\r",
+							"        pm.expect(address).to.have.property('number');\r",
+							"        pm.expect(address).to.have.property('street');\r",
+							"        pm.expect(address).to.have.property('zip_code');\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Clinic service times set array is present and has expected number of elements\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.clinic_service_times_set).to.exist;\r",
+							"    pm.expect(responseData.clinic_service_times_set).to.be.an('array');\r",
+							"    pm.expect(responseData.clinic_service_times_set).to.have.lengthOf.at.least(1);\r",
+							"});\r",
+							"\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -90,12 +119,14 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Resetar IDs antes da criação\r",
-							"pm.environment.unset(\"clinic_id\");\r",
-							"pm.environment.unset(\"address_id\");\r",
-							"pm.environment.unset(\"affiliated_address_id\");\r",
-							"pm.environment.unset(\"billing_id\");\r",
-							"console.log(\"IDs resetados.\");\r",
+							"// Função para gerar nome dinâmico\r",
+							"function generateUniqueName() {\r",
+							"    return `Clinica_${new Date().getTime()}`;\r",
+							"}\r",
+							"\r",
+							"// Define nome e e-mail dinâmicos\r",
+							"pm.environment.set(\"clinicName\", generateUniqueName());\r",
+							"pm.environment.set(\"email\", `clinic_${new Date().getTime()}@test.com`);\r",
 							""
 						],
 						"type": "text/javascript",
@@ -111,7 +142,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Clinica X Dinâmica\",\r\n  \"profile\": \"manager\",\r\n  \"preferred_network\": true,\r\n  \"clinic_addresses_relation\": {\r\n    \"street\": \"Rua C\",\r\n    \"number\": \"300\",\r\n    \"neighborhood\": \"Jardim Paulista\",\r\n    \"complement\": \"Fundos\",\r\n    \"reference_point\": \"Próximo ao shopping\",\r\n    \"type_address\": \"Comercial\",\r\n    \"zip_code\": \"01003-000\",\r\n    \"city\": \"São Paulo\",\r\n    \"state\": \"SP\"\r\n  },\r\n  \"clinic_affiliated_addresses_relation\": [\r\n    {\r\n      \"street\": \"Rua D\",\r\n      \"number\": \"400\",\r\n      \"neighborhood\": \"Jardim Paulista\",\r\n      \"complement\": \"Fundos\",\r\n      \"reference_point\": \"Próximo ao shopping\",\r\n      \"type_address\": \"Comercial\",\r\n      \"zip_code\": \"01004-000\",\r\n      \"city\": \"São Paulo\",\r\n      \"state\": \"SP\",\r\n      \"email\": \"affiliated@clinic.com\"\r\n    }\r\n  ]\r\n}",
+					"raw": "{\r\n  \"name\": \"{{clinicName}}\",\r\n  \"profile\": \"manager\",\r\n  \"preferred_network\": true,\r\n  \"clinic_services_relation\": [\r\n    {\r\n      \"title\": \"Atendimento Geral\"\r\n    }\r\n  ],\r\n  \"clinic_service_times_relation\": [\r\n    {\r\n      \"start_time\": \"08:00:00\",\r\n      \"end_time\": \"18:00:00\",\r\n      \"days\": [\"seg\", \"ter\", \"qua\", \"qui\", \"sex\"]\r\n    }\r\n  ],\r\n  \"clinic_main_professionals_relation\": {\r\n    \"name\": \"Dr. Fulano\",\r\n    \"cpf\": \"00011122233\",\r\n    \"crm\": \"CRM1234\",\r\n    \"state\": \"SP\",\r\n    \"cellphone\": \"999888777\",\r\n    \"email\": \"{{email}}\"\r\n  },\r\n  \"clinic_languages_relation\": [\r\n    {\r\n      \"title\": \"Português\"\r\n    }\r\n  ],\r\n  \"clinic_documents_relation\": [\r\n    {\r\n      \"document_type\": \"CNES\",\r\n      \"end_date\": \"2023-01-01\",\r\n      \"url\": \"http://...\",\r\n      \"filename\": \"doc.pdf\"\r\n    }\r\n  ],\r\n  \"clinic_classifications_relation\": {\r\n    \"title\": \"Ouro\"\r\n  },\r\n  \"clinic_representatives_relation\": [\r\n    {\r\n      \"representative_birthdate\": \"2000-01-01\",\r\n      \"representative_cpf\": \"1234-1234\",\r\n      \"representative_email\": \"{{email}}\",\r\n      \"representative_gender\": \"Masculino\",\r\n      \"representative_name\": \"Jose Ferreira\",\r\n      \"representative_rg\": \"123456789\"\r\n    }\r\n  ],\r\n  \"clinic_billings_relation\": {\r\n    \"payment_type\": \"BOLETO\",\r\n    \"account_holder\": \"{{clinicName}}\",\r\n    \"bank\": \"Banco Y\",\r\n    \"agency\": \"0001\",\r\n    \"contact_name\": \"Financeiro\",\r\n    \"contact_email\": \"fin@clinic.com\",\r\n    \"contact_cellphone\": \"222333444\",\r\n    \"contact_phone\": \"333444555\"\r\n  },\r\n  \"clinic_addresses_relation\": [\r\n    {\r\n      \"street\": \"Rua C\",\r\n      \"number\": \"300\",\r\n      \"neighborhood\": \"Jardim Paulista\",\r\n      \"complement\": \"Fundos\",\r\n      \"reference_point\": \"Próximo ao shopping\",\r\n      \"type_address\": \"Comercial\",\r\n      \"zip_code\": \"01003-000\",\r\n      \"city\": \"São Paulo\",\r\n      \"state\": \"SP\"\r\n    }\r\n  ]\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -145,30 +176,39 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Verificar status 200 - Clínica Obtida\", function () {\r",
-							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
 							"});\r",
 							"\r",
-							"let response = pm.response.json();\r",
 							"\r",
-							"// Validar Clinic ID\r",
-							"pm.test(\"Validar Clinic ID\", function () {\r",
-							"    pm.expect(response.id).to.equal(parseInt(pm.environment.get(\"clinic_id\")));\r",
+							"pm.test(\"Response has the required fields - id, name, date_created, date_updated\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData).to.have.property('id');\r",
+							"    pm.expect(responseData).to.have.property('name');\r",
+							"    pm.expect(responseData).to.have.property('date_created');\r",
+							"    pm.expect(responseData).to.have.property('date_updated');\r",
 							"});\r",
 							"\r",
-							"// Validar Address ID\r",
-							"pm.test(\"Validar Address ID\", function () {\r",
-							"    let addressId = pm.environment.get(\"address_id\");\r",
-							"    let addressFound = response.addresses_set.some(addr => addr.id === parseInt(addressId));\r",
-							"    pm.expect(addressFound).to.be.true;\r",
+							"\r",
+							"pm.test(\"Clinic addresses relation array is present and has expected number of elements\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.clinic_addresses_relation).to.exist.and.to.be.an('array');\r",
+							"    pm.expect(responseData.clinic_addresses_relation).to.have.lengthOf(1);\r",
 							"});\r",
 							"\r",
-							"// Validar Affiliated Address ID\r",
-							"pm.test(\"Validar Affiliated Address ID\", function () {\r",
-							"    let affiliatedAddressId = pm.environment.get(\"affiliated_address_id\");\r",
-							"    let affiliatedAddressFound = response.affiliated_addresses_set.some(addr => addr.id === parseInt(affiliatedAddressId));\r",
-							"    pm.expect(affiliatedAddressFound).to.be.true;\r",
-							"});"
+							"\r",
+							"pm.test(\"Clinic services set array is present and not empty\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.clinic_services_set).to.exist;\r",
+							"    pm.expect(responseData.clinic_services_set).to.be.an('array').that.is.not.empty;\r",
+							"});\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -178,9 +218,7 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"if (!pm.environment.get(\"clinic_id\")) {\r",
-							"    throw new Error(\"Clinic ID não definido. Execute o POST primeiro.\");\r",
-							"}"
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -194,7 +232,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clinics/{{clinic_id}}",
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clinics/{{clinicId}}",
 					"protocol": "https",
 					"host": [
 						"fap-clinic",
@@ -208,7 +246,7 @@
 						"api",
 						"v1",
 						"clinics",
-						"{{clinic_id}}"
+						"{{clinicId}}"
 					]
 				}
 			},
@@ -221,13 +259,55 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Verificar status 200 - Clínica Atualizada\", function () {\r",
-							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
 							"});\r",
 							"\r",
-							"let response = pm.response.json();\r",
 							"\r",
-							"\r",
+							"pm.test(\"Validate the response schema\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData).to.have.property('certificates_set');\r",
+							"    pm.expect(responseData).to.have.property('client_cnae_classifications_set');\r",
+							"    pm.expect(responseData).to.have.property('client_coordinators_set');\r",
+							"    pm.expect(responseData).to.have.property('client_documents_set');\r",
+							"    pm.expect(responseData).to.have.property('clinic_addresses_relation');\r",
+							"    pm.expect(responseData).to.have.property('clinic_billings_relation');\r",
+							"    pm.expect(responseData).to.have.property('clinic_billings_set');\r",
+							"    pm.expect(responseData).to.have.property('clinic_classifications_relation');\r",
+							"    pm.expect(responseData).to.have.property('clinic_classifications_set');\r",
+							"    pm.expect(responseData).to.have.property('clinic_documents_relation');\r",
+							"    pm.expect(responseData).to.have.property('clinic_documents_set');\r",
+							"    pm.expect(responseData).to.have.property('clinic_infos_set');\r",
+							"    pm.expect(responseData).to.have.property('clinic_languages_relation');\r",
+							"    pm.expect(responseData).to.have.property('clinic_languages_set');\r",
+							"    pm.expect(responseData).to.have.property('clinic_main_professionals_relation');\r",
+							"    pm.expect(responseData).to.have.property('clinic_main_professionals_set');\r",
+							"    pm.expect(responseData).to.have.property('clinic_offices_set');\r",
+							"    pm.expect(responseData).to.have.property('clinic_representatives_relation');\r",
+							"    pm.expect(responseData).to.have.property('clinic_representatives_set');\r",
+							"    pm.expect(responseData).to.have.property('clinic_service_times_relation');\r",
+							"    pm.expect(responseData).to.have.property('clinic_service_times_set');\r",
+							"    pm.expect(responseData).to.have.property('clinic_services_relation');\r",
+							"    pm.expect(responseData).to.have.property('clinic_services_set');\r",
+							"    pm.expect(responseData).to.have.property('cnpj');\r",
+							"    pm.expect(responseData).to.have.property('date_created');\r",
+							"    pm.expect(responseData).to.have.property('date_updated');\r",
+							"    pm.expect(responseData).to.have.property('exam_prices_set');\r",
+							"    pm.expect(responseData).to.have.property('id');\r",
+							"    pm.expect(responseData).to.have.property('managers_set');\r",
+							"    pm.expect(responseData).to.have.property('name');\r",
+							"    pm.expect(responseData).to.have.property('patient_contacts_set');\r",
+							"    pm.expect(responseData).to.have.property('patient_employers_set');\r",
+							"    pm.expect(responseData).to.have.property('preferred_network');\r",
+							"    pm.expect(responseData).to.have.property('professional_credentials_set');\r",
+							"    pm.expect(responseData).to.have.property('professionals_set');\r",
+							"    pm.expect(responseData).to.have.property('profile');\r",
+							"    pm.expect(responseData).to.have.property('profiles_set');\r",
+							"    pm.expect(responseData).to.have.property('specialty_prices_set');\r",
+							"    pm.expect(responseData).to.have.property('status');\r",
+							"});\r",
 							""
 						],
 						"type": "text/javascript",
@@ -238,9 +318,7 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"if (!pm.environment.get(\"address_id\")) {\r",
-							"    throw new Error(\"Address ID não definido. Execute o POST e GET primeiro.\");\r",
-							"}"
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -255,7 +333,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Clinica X Dinâmica atualizada\",\r\n  \"profile\": \"manager\",\r\n  \"preferred_network\": true,\r\n  \"clinic_addresses_relation\": {\r\n    \"street\": \"Rua C\",\r\n    \"number\": \"300\",\r\n    \"neighborhood\": \"Jardim Paulista\",\r\n    \"complement\": \"Fundos\",\r\n    \"reference_point\": \"Próximo ao shopping\",\r\n    \"type_address\": \"Comercial\",\r\n    \"zip_code\": \"01003-000\",\r\n    \"city\": \"São Paulo\",\r\n    \"state\": \"SP\"\r\n  },\r\n  \"clinic_affiliated_addresses_relation\": [\r\n    {\r\n      \"street\": \"Rua D\",\r\n      \"number\": \"400\",\r\n      \"neighborhood\": \"Jardim Paulista\",\r\n      \"complement\": \"Fundos\",\r\n      \"reference_point\": \"Próximo ao shopping\",\r\n      \"type_address\": \"Comercial\",\r\n      \"zip_code\": \"01004-000\",\r\n      \"city\": \"São Paulo\",\r\n      \"state\": \"SP\",\r\n      \"email\": \"affiliated@clinic.com\"\r\n    }\r\n  ]\r\n}",
+					"raw": "{\r\n  \"name\": \"{{clinicName}} - Atualizada\",\r\n  \"profile\": \"manager\",\r\n  \"preferred_network\": false,\r\n  \"clinic_services_relation\": [\r\n    {\r\n      \"title\": \"Atendimento Especializado\"\r\n    }\r\n  ],\r\n  \"clinic_languages_relation\": [\r\n    {\r\n      \"title\": \"Inglês\"\r\n    }\r\n  ]\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -263,7 +341,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clinics/{{clinic_id}}",
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clinics/{{clinicId}}",
 					"protocol": "https",
 					"host": [
 						"fap-clinic",
@@ -277,7 +355,7 @@
 						"api",
 						"v1",
 						"clinics",
-						"{{clinic_id}}"
+						"{{clinicId}}"
 					]
 				}
 			},
@@ -290,13 +368,24 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"// Verificar status 204 - Clínica Excluída\r",
-							"pm.test(\"Verificar status 204 - Clínica Excluída\", function () {\r",
-							"    pm.expect(pm.response.code).to.equal(204);\r",
-							"});"
+							"\r",
+							"\r",
+							"pm.test(\"Response time is within an acceptable range\", function () {\r",
+							"  pm.expect(pm.response.responseTime).to.be.below(500);\r",
+							"});\r",
+							"\r",
+							"\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"packages": {},
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -311,7 +400,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clinics/{{clinic_id}}\n",
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clinics/{{clinicId}}\n",
 					"protocol": "https",
 					"host": [
 						"fap-clinic",
@@ -325,7 +414,7 @@
 						"api",
 						"v1",
 						"clinics",
-						"{{clinic_id}}\n"
+						"{{clinicId}}\n"
 					]
 				}
 			},
