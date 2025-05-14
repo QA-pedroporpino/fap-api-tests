@@ -1,0 +1,395 @@
+{
+	"info": {
+		"_postman_id": "8598f15c-830d-4361-b920-5373e972e89b",
+		"name": "/api/v1/holidays",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37354928"
+	},
+	"item": [
+		{
+			"name": "Listar todas os feriados - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verificar se o status é 200 OK\r",
+							"pm.test(\"Status 200 OK\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"// Verificar se a resposta é um objeto\r",
+							"pm.test(\"Resposta é um objeto\", function () {\r",
+							"    let responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson).to.be.an(\"object\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/holidays",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"holidays"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Criar um feriado  - 201 Created",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let response = pm.response.json();\r",
+							"\r",
+							"if (pm.response.code === 201) {\r",
+							"    pm.environment.set(\"holidayId\", response.id);\r",
+							"    console.log(\"Feriado criado com ID:\", response.id);\r",
+							"} else {\r",
+							"    console.log(\"Erro na criação do feriado:\", response);\r",
+							"}\r",
+							"\r",
+							"pm.test(\"Response status code is 201\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(201);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has the required fields\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData).to.have.property('date');\r",
+							"    pm.expect(responseData).to.have.property('date_created');\r",
+							"    pm.expect(responseData).to.have.property('date_updated');\r",
+							"    pm.expect(responseData).to.have.property('id');\r",
+							"    pm.expect(responseData).to.have.property('is_recurrent');\r",
+							"    pm.expect(responseData).to.have.property('name');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Date is in a valid date format\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"  \r",
+							"  pm.expect(responseData.date).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							"pm.test(\"Id should be a positive integer\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData.id).to.be.a('number');\r",
+							"    pm.expect(responseData.id).to.be.above(0, \"Id should be a positive integer\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Função para gerar uma data dinâmica\r",
+							"function getDynamicDate() {\r",
+							"    let today = new Date();\r",
+							"    let nextYear = today.getFullYear() + 1;\r",
+							"    return `${nextYear}-12-25`; // Próximo Natal\r",
+							"}\r",
+							"\r",
+							"// Função para gerar um nome dinâmico\r",
+							"function getDynamicName() {\r",
+							"    return `Holiday_${new Date().getTime()}`;\r",
+							"}\r",
+							"\r",
+							"pm.environment.set(\"holidayDate\", getDynamicDate());\r",
+							"pm.environment.set(\"holidayName\", getDynamicName());"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"date\": \"{{holidayDate}}\",\r\n  \"name\": \"{{holidayName}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/holidays",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"holidays"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obter Feriado pelo ID- 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response time is less than 200ms\", function () {\r",
+							"  pm.expect(pm.response.responseTime).to.be.below(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Validate the response schema for required fields - date, date_created, date_updated, id, is_recurrent, and name\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.date).to.exist;\r",
+							"    pm.expect(responseData.date_created).to.exist;\r",
+							"    pm.expect(responseData.date_updated).to.exist;\r",
+							"    pm.expect(responseData.id).to.exist;\r",
+							"    pm.expect(responseData.is_recurrent).to.exist;\r",
+							"    pm.expect(responseData.name).to.exist;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/holidays/{{holidayId}}",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"holidays",
+						"{{holidayId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Atualizar um feriado existente - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"  pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Validate the response schema\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.date).to.exist.and.to.be.a('string');\r",
+							"    pm.expect(responseData.date_created).to.exist.and.to.be.a('string');\r",
+							"    pm.expect(responseData.date_updated).to.exist.and.to.be.a('string');\r",
+							"    pm.expect(responseData.id).to.exist.and.to.be.a('number');\r",
+							"    pm.expect(responseData.is_recurrent).to.exist.and.to.be.a('boolean');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Name field must be a non-empty string\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.name).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Name field should not be empty\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"date\": \"2025-12-31\",\r\n  \"name\": \"{{holidayName}} - Atualizado\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/holidays/{{holidayId}}",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"holidays",
+						"{{holidayId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deletar um feriado - 204 No Content",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 204) {\r",
+							"    console.log(\"Feriado deletado com sucesso.\");\r",
+							"    pm.environment.unset(\"holidayId\");\r",
+							"    pm.environment.unset(\"holidayDate\");\r",
+							"    pm.environment.unset(\"holidayName\");\r",
+							"} else {\r",
+							"    console.log(\"Erro ao deletar o feriado. Código:\", pm.response.code);\r",
+							"}\r",
+							"\r",
+							"pm.test(\"Response status code is 204\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(204);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/holidays/{{holidayId}}\n",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"holidays",
+						"{{holidayId}}\n"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
