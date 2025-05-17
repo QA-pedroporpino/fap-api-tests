@@ -98,20 +98,21 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Verificar status 201 - Profissional Criado\", function () {\r",
+							"pm.test(\"Verificar criação com status 201\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(201);\r",
 							"});\r",
 							"\r",
 							"let response = pm.response.json();\r",
-							"console.log(\"Response: \", response);\r",
 							"\r",
 							"// Capturar o ID do profissional criado\r",
 							"if (response.id) {\r",
 							"    pm.environment.set(\"professional_id\", response.id);\r",
-							"    console.log(\"Professional ID salvo: \" + response.id);\r",
+							"    console.log(\"ID do profissional salvo: \" + response.id);\r",
 							"} else {\r",
-							"    console.log(\"Professional ID não encontrado na resposta.\");\r",
-							"}"
+							"    pm.environment.unset(\"professional_id\");\r",
+							"    console.log(\"ID não encontrado na resposta.\");\r",
+							"}\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -126,25 +127,12 @@
 							"pm.environment.set(\"timestamp\", timestamp);\r",
 							"console.log(\"Timestamp gerado: \" + timestamp);\r",
 							"\r",
-							"// Capturar IDs disponíveis dinamicamente\r",
-							"\r",
-							"// Define um endereço existente\r",
-							"pm.environment.set(\"address_id\", 64); // Usando o último ID do resultado do GET\r",
-							"\r",
-							"// Define um profile_id existente\r",
-							"pm.environment.set(\"profile_id\", 27); // Usando um profile_id existente\r",
-							"\r",
-							"// Define um specialty_id existente\r",
-							"pm.environment.set(\"specialty_id\", 5); // Usando um specialty_id existente\r",
-							"\r",
-							"// Define um sub_specialty_id existente\r",
-							"pm.environment.set(\"sub_specialty_id\", 2); // Usando um sub_specialty_id existente\r",
-							"\r",
-							"// Define um motive_id existente\r",
-							"pm.environment.set(\"motive_id\", 1); // Usando um motive_id existente\r",
-							"\r",
-							"console.log(\"IDs configurados dinamicamente.\");\r",
-							""
+							"// Definindo os IDs existentes\r",
+							"pm.environment.set(\"profile_id\", 215);\r",
+							"pm.environment.set(\"specialty_id\", 5);\r",
+							"pm.environment.set(\"sub_specialty_id\", 2);\r",
+							"pm.environment.set(\"motive_id\", 1);\r",
+							"pm.environment.set(\"address_id\", 64);"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -193,13 +181,15 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Verificar status 200 - Profissional Obtido\", function () {\r",
+							"pm.test(\"Verificar existência do último profissional criado\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"    let response = pm.response.json();\r",
+							"    \r",
+							"    // Verificar se o nome contém o timestamp\r",
+							"    pm.expect(response.name).to.include(pm.environment.get(\"timestamp\").toString());\r",
+							"    \r",
+							"    console.log(\"Último profissional encontrado: \", response);\r",
 							"});\r",
-							"\r",
-							"let response = pm.response.json();\r",
-							"console.log(\"Response: \", response);\r",
-							"\r",
 							""
 						],
 						"type": "text/javascript",
@@ -210,29 +200,10 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Gerar um timestamp único\r",
-							"const timestamp = new Date().getTime();\r",
-							"pm.environment.set(\"timestamp\", timestamp);\r",
-							"console.log(\"Timestamp gerado: \" + timestamp);\r",
-							"\r",
-							"// Capturar IDs disponíveis dinamicamente\r",
-							"\r",
-							"// Define um endereço existente\r",
-							"pm.environment.set(\"address_id\", 64); // Usando o último ID do resultado do GET\r",
-							"\r",
-							"// Define um profile_id existente\r",
-							"pm.environment.set(\"profile_id\", 27); // Usando um profile_id existente\r",
-							"\r",
-							"// Define um specialty_id existente\r",
-							"pm.environment.set(\"specialty_id\", 5); // Usando um specialty_id existente\r",
-							"\r",
-							"// Define um sub_specialty_id existente\r",
-							"pm.environment.set(\"sub_specialty_id\", 2); // Usando um sub_specialty_id existente\r",
-							"\r",
-							"// Define um motive_id existente\r",
-							"pm.environment.set(\"motive_id\", 1); // Usando um motive_id existente\r",
-							"\r",
-							"console.log(\"IDs configurados dinamicamente.\");"
+							"if (!pm.environment.get(\"professional_id\")) {\r",
+							"    throw new Error(\"Nenhum profissional criado. Execute o POST primeiro.\");\r",
+							"}\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -316,7 +287,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Dr. Atualizado {{timestamp}}\",\r\n  \"email\": \"atualizado.profissional{{timestamp}}@example.com\",\r\n  \"document_type\": \"CPF\",\r\n  \"document\": \"123456789{{timestamp}}\",\r\n  \"registry_type\": \"CRM\",\r\n  \"registry\": \"CRM{{timestamp}}\",\r\n  \"social_name\": \"Atualizado Social\",\r\n  \"birthdate\": \"1991-03-03\",\r\n  \"mini_bio\": \"Mini bio atualizada para profissional {{timestamp}}\",\r\n  \"presentation_video_link\": \"http://novo.video.atualizado\",\r\n  \"phone\": \"11999999999\",\r\n  \"cellphone\": \"11988888888\",\r\n  \"profile_photo\": \"http://atualizado.foto\",\r\n  \"active\": true,\r\n  \"profile_id\": \"{{profile_id}}\",\r\n  \"address_relation\": {\r\n    \"zip_code\": \"13076-001\",\r\n    \"street\": \"Avenida Júlio Prestes\",\r\n    \"number\": \"741\",\r\n    \"state\": \"SP\",\r\n    \"city\": \"Campinas\",\r\n    \"id\": \"{{address_id}}\"\r\n  },\r\n  \"specialty_relation\": [\r\n    {\r\n      \"id\": \"{{specialty_id}}\",\r\n      \"name\": \"Dermatologia\"\r\n    }\r\n  ],\r\n  \"sub_specialty_relation\": [\r\n    {\r\n      \"id\": \"{{sub_specialty_id}}\",\r\n      \"name\": \"Cardiologia intervencionista\"\r\n    }\r\n  ],\r\n  \"motive_relation\": [\r\n    {\r\n      \"id\": \"{{motive_id}}\",\r\n      \"name\": \"Consulta de rotina\"\r\n    }\r\n  ]\r\n}\r\n",
+					"raw": "{\r\n  \"name\": \"Dr. Atualizado {{timestamp}}\",\r\n  \"mini_bio\": \"Mini bio atualizada para profissional {{timestamp}}\",\r\n  \"phone\": \"11999988888\",\r\n  \"cellphone\": \"1188889999\"\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -351,11 +322,12 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Verificar status 204 - Profissional Deletado\", function () {\r",
+							"pm.test(\"Verificar deleção com status 204\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(204);\r",
 							"});\r",
 							"\r",
-							"console.log(\"Professional ID \" + pm.environment.get(\"professional_id\") + \" foi excluído.\");\r",
+							"// Remover o `professional_id` após a deleção\r",
+							"pm.environment.unset(\"professional_id\");\r",
 							""
 						],
 						"type": "text/javascript",
