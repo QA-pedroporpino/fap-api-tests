@@ -11,6 +11,7 @@ if (-not (Test-Path $reportsPath)) {
 
 # Collections to run
 $collections = @(
+    "api-tests/collections/-auth-login-.postman_collection.json",
     "api-tests/collections/-api-v1-certificates.postman_collection.json",
     "api-tests/collections/-api-v1-clients.postman_collection.json",
     "api-tests/collections/-api-v1-clinics.postman_collection.json",

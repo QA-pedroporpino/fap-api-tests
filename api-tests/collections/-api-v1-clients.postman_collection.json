@@ -25,7 +25,14 @@
 			],
 			"request": {
 				"auth": {
-					"type": "noauth"
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
 				},
 				"method": "GET",
 				"header": [],
@@ -351,6 +358,45 @@
 				}
 			},
 			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": ".eJxdj8tqAzEMRf9F6xDodlb9j1KMKisZgR_C0qQNof9emU4Lk511faTDfYBkWF5OwBWlwAKt3_pZR7-ImfSG5ZW_sGrhM_UKJ_C7cmCT4J2IVHnU3wWD5Q0y2vrRceRUseGVRyAXadhIsOxZ5eYRU5EmlIx903lomgunzXgcQaOV8xZfN-HPmFG1S_NE4dyKo4c84spZKCSDqY88OXekNeZJWZptbBf9FUj_tw9GjZvxitWrmI9ngynPOn5_BqbimL1__wAgTIbP.aC3efQ.YnMSVOUO2Z7DdiC-xpHinsx_nIo",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "bearer_token",
+			"value": "",
+			"type": "string"
 		}
 	]
 }

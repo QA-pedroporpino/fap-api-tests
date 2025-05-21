@@ -1,0 +1,65 @@
+{
+	"info": {
+		"_postman_id": "1861e92d-05fb-44f0-8f34-c692dac4d024",
+		"name": "/auth/login/",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37354928"
+	},
+	"item": [
+		{
+			"name": "Teste de Login - 200 ok",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 200) {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.collectionVariables.set(\"bearer_token\", jsonData.user.auth_token);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"novo.profissional@example.com\",\r\n  \"password\": \"senha123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/auth/login",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "bearer_token",
+			"value": ""
+		}
+	]
+}
