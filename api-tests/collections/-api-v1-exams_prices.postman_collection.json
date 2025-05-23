@@ -128,7 +128,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"table_price_id\": {{selected_table_price_id}},\r\n  \"exam_id\": {{selected_exam_id}},\r\n  \"title\": \"Consulta com Exames Atualizada {{timestamp}}\",\r\n  \"sla\": 48,\r\n  \"price\": 450\r\n}\r\n",
+					"raw": "{\r\n  \"table_price_id\": {{selected_table_price_id}},\r\n  \"exam_id\": {{selected_exam_id}},\r\n  \"title\": \"Consulta com Exames {{timestamp}}\",\r\n  \"sla\": 48,\r\n  \"price\": 450\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
