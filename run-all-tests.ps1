@@ -34,7 +34,7 @@ Write-Host "`nRunning all collections..." -ForegroundColor Green
 # Run each collection
 foreach ($collection in $collections) {
     Write-Host "`nRunning collection: $collection`n" -ForegroundColor Yellow
-    newman run $collection -r cli
+    newman run $collection -g "api-tests/collections/workspace.postman_globals.json" -r cli
 }
 
 Write-Host "`n===============================================" -ForegroundColor Green
