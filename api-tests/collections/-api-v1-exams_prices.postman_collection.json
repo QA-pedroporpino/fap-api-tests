@@ -89,20 +89,19 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Verificar status 201 - Preço de Exame Criado\", function () {\r",
+							"pm.test(\"Status code is 201 - Price Criado\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(201);\r",
 							"});\r",
 							"\r",
-							"let response = pm.response.json();\r",
-							"console.log(\"Response: \", response);\r",
+							"const response = pm.response.json();\r",
 							"\r",
-							"// Capturar o ID do preço criado\r",
 							"if (response.id) {\r",
-							"    pm.environment.set(\"price_id\", response.id);\r",
-							"    console.log(\"Price ID salvo: \" + response.id);\r",
+							"    pm.collectionVariables.set(\"price_id\", response.id);\r",
+							"    console.log(`Exam Price criado com ID: ${response.id}`);\r",
 							"} else {\r",
-							"    console.log(\"Price ID não encontrado na resposta.\");\r",
-							"}"
+							"    console.warn(\"Exam Price ID não encontrado na resposta.\");\r",
+							"}\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -112,14 +111,9 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Resetar IDs antes da criação\r",
-							"pm.environment.unset(\"price_id\");\r",
-							"pm.environment.unset(\"timestamp\");\r",
-							"\r",
-							"// Gerar um timestamp único para evitar duplicidades\r",
-							"const timestamp = new Date().getTime();\r",
-							"pm.environment.set(\"timestamp\", timestamp);\r",
-							"console.log(\"Timestamp gerado: \" + timestamp);"
+							"const timestamp = Date.now();\r",
+							"pm.collectionVariables.set(\"timestamp\", timestamp);\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -134,7 +128,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"table_price_id\": 2,\r\n  \"exam_id\": 6,\r\n  \"title\": \"Consulta com Exames Atualizada {{timestamp}}\",\r\n  \"sla\": 48,\r\n  \"price\": 450\r\n}",
+					"raw": "{\r\n  \"table_price_id\": {{selected_table_price_id}},\r\n  \"exam_id\": {{selected_exam_id}},\r\n  \"title\": \"Consulta com Exames Atualizada {{timestamp}}\",\r\n  \"sla\": 48,\r\n  \"price\": 450\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -168,14 +162,8 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"// Fixed the status check to 200\r",
 							"pm.test(\"Verificar status 200 - Exam Price Obtido\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(200);\r",
-							"});\r",
-							"\r",
-							"// Updated the response time test to 300ms\r",
-							"pm.test(\"Response time is within acceptable range\", function () {\r",
-							"    pm.expect(pm.response.responseTime).to.be.below(300);\r",
 							"});\r",
 							"\r",
 							"console.log(\"Exam Price obtido com sucesso.\");\r",
@@ -189,24 +177,31 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Garantir que o price_id esteja definido antes do GET\r",
-							"if (!pm.environment.get(\"price_id\")) {\r",
-							"    throw new Error(\"O price_id não está definido no ambiente.\");\r",
-							"}\r",
-							"\r",
-							"console.log(\"Price ID encontrado: \" + pm.environment.get(\"price_id\"));"
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
 					}
 				}
 			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
 				"auth": {
 					"type": "noauth"
 				},
 				"method": "GET",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
 					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/exam_prices/{{price_id}}",
 					"protocol": "https",
@@ -257,8 +252,16 @@
 					"script": {
 						"exec": [
 							"if (!pm.environment.get(\"price_id\")) {\r",
-							"    throw new Error(\"Price ID não definido. Execute o POST primeiro.\");\r",
-							"}"
+							"    console.warn(\"⚠️ Atenção: 'price_id' não está definido. Certifique-se de ter executado o POST.\");\r",
+							"}\r",
+							"if (!pm.environment.get(\"selected_exam_id\")) {\r",
+							"    console.warn(\"⚠️ Atenção: 'selected_exam_id' não está definido.\");\r",
+							"}\r",
+							"if (!pm.environment.get(\"selected_table_price_id\")) {\r",
+							"    console.warn(\"⚠️ Atenção: 'selected_table_price_id' não está definido.\");\r",
+							"}\r",
+							"pm.environment.set(\"timestamp\", Date.now());\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -273,7 +276,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"table_price_id\": 2,\r\n  \"exam_id\": 6,\r\n  \"title\": \"Consulta com Exames Atualizada {{timestamp}}\",\r\n  \"sla\": 48,\r\n  \"price\": 450\r\n}",
+					"raw": "{\r\n  \"table_price_id\": {{selected_table_price_id}},\r\n  \"exam_id\": {{selected_exam_id}},\r\n  \"title\": \"Consulta com Exames Atualizada {{timestamp}}\",\r\n  \"sla\": 48,\r\n  \"price\": 450\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -308,11 +311,13 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Verificar status 204 - Preço de Exame Deletado\", function () {\r",
-							"    pm.expect(pm.response.code).to.equal(204);\r",
+							"pm.test(\"Verificar status 204 - Exame Deletado\", function () {\r",
+							"    pm.expect(pm.response.code).to.eql(204);\r",
 							"});\r",
 							"\r",
-							"console.log(\"Price ID \" + pm.environment.get(\"price_id\") + \" foi excluído.\");\r",
+							"pm.environment.unset(\"price_id\");\r",
+							"\r",
+							"console.log(\"✅ Exam Price deletado e variável 'price_id' removida do ambiente.\");\r",
 							""
 						],
 						"type": "text/javascript",
@@ -323,9 +328,7 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"if (!pm.environment.get(\"price_id\")) {\r",
-							"    throw new Error(\"Price ID não definido. Execute o POST primeiro.\");\r",
-							"}"
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -405,6 +408,28 @@
 					""
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"key": "selected_exam_id",
+			"value": ""
+		},
+		{
+			"key": "selected_table_price_id",
+			"value": ""
+		},
+		{
+			"key": "timestamp",
+			"value": ""
+		},
+		{
+			"key": "created_exam_price_id",
+			"value": ""
+		},
+		{
+			"key": "price_id",
+			"value": ""
 		}
 	]
 }

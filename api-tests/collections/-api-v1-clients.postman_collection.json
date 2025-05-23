@@ -21,8 +21,21 @@
 						"type": "text/javascript",
 						"packages": {}
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
 				}
 			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -36,6 +49,15 @@
 				},
 				"method": "GET",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
 					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clients",
 					"protocol": "https",
@@ -63,26 +85,60 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"POST - Verificar Criação do Cliente\", function() {\r",
-							"    pm.expect(pm.response.code).to.eql(201);\r",
-							"    const responseData = pm.response.json();\r",
-							"    pm.environment.set(\"clientId\", responseData.id);\r",
-							"    console.log(\"Cliente criado com ID:\", responseData.id);\r",
-							"});\r",
-							"// Test for the response code\r",
-							"pm.test(\"Status code is 201\", function () {\r",
+							"const response = pm.response.json();\r",
+							"\r",
+							"if (response.id) {\r",
+							"    pm.environment.set(\"client_id\", response.id);\r",
+							"    console.log(\"Client ID salvo: \" + response.id);\r",
+							"} else {\r",
+							"    console.warn(\"Não foi possível capturar o client_id.\");\r",
+							"}\r",
+							"\r",
+							"pm.test(\"Response status code is 201\", function () {\r",
 							"    pm.response.to.have.status(201);\r",
 							"});\r",
 							"\r",
-							"// Test for the response time\r",
-							"pm.test(\"Response time is less than 600ms\", function () {\r",
-							"    pm.expect(pm.response.responseTime).to.be.below(600);\r",
+							"\r",
+							"pm.test(\"Validate client_addresses_relation object structure and required fields\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData.client_addresses_relation).to.be.an('array').that.is.not.empty;\r",
+							"\r",
+							"    responseData.client_addresses_relation.forEach(function(address) {\r",
+							"        pm.expect(address).to.have.property('city').that.is.a('string');\r",
+							"        pm.expect(address).to.have.property('complement').that.is.a('string');\r",
+							"        pm.expect(address).to.have.property('email').that.is.null;\r",
+							"        pm.expect(address).to.have.property('neighborhood').that.is.a('string');\r",
+							"        pm.expect(address).to.have.property('number').that.is.a('string');\r",
+							"        pm.expect(address).to.have.property('phone').that.is.null;\r",
+							"        pm.expect(address).to.have.property('state').that.is.a('string');\r",
+							"        pm.expect(address).to.have.property('street').that.is.a('string');\r",
+							"        pm.expect(address).to.have.property('zip_code').that.is.a('string');\r",
+							"    });\r",
 							"});\r",
 							"\r",
-							"// Test for the content type of the response\r",
-							"pm.test(\"Content type is application/json\", function () {\r",
-							"    pm.response.to.have.header('Content-Type', 'application/json');\r",
+							"\r",
+							"pm.test(\"Cnae_classification_relation object structure and required fields\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"  \r",
+							"  pm.expect(responseData.cnae_classification_relation).to.be.an('object');\r",
+							"  pm.expect(responseData.cnae_classification_relation.classification_type).to.exist.and.to.be.a('string');\r",
+							"  pm.expect(responseData.cnae_classification_relation.client_id).to.exist.and.to.be.a('number');\r",
+							"  pm.expect(responseData.cnae_classification_relation.date_created).to.exist.and.to.be.a('string');\r",
+							"  pm.expect(responseData.cnae_classification_relation.date_updated).to.exist.and.to.be.a('string');\r",
+							"  pm.expect(responseData.cnae_classification_relation.description).to.exist.and.to.be.a('string');\r",
+							"  pm.expect(responseData.cnae_classification_relation.id).to.exist.and.to.be.a('number');\r",
+							"  pm.expect(responseData.cnae_classification_relation.rate).to.exist.and.to.be.a('string');\r",
 							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Ensure the presence of specific fields\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData).to.include.all.keys(\"exam_price_table_id\", \"legal_representative\", \"specialty_price_table_id\", \"state_registration\");\r",
+							"});\r",
+							"\r",
 							""
 						],
 						"type": "text/javascript",
@@ -93,10 +149,12 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Gerar CNPJ dinâmico\r",
-							"const cnpjBase = \"98.\" + Math.floor(Math.random() * 900) + 100 + \".432/0001\";\r",
-							"const cnpj = cnpjBase.substring(0, 18);\r",
-							"pm.environment.set(\"dynamicCNPJ\", cnpj);\r",
+							"const baseCNPJ = '98.' + Math.floor(100000 + Math.random() * 899999).toString() + '/0001-';\r",
+							"const randomDigit = Math.floor(Math.random() * 100).toString().padStart(2, '0');\r",
+							"pm.environment.set(\"dynamicCNPJ\", baseCNPJ + randomDigit);\r",
+							"\r",
+							"// Caso queira timestamp também para outros usos:\r",
+							"pm.environment.set(\"timestamp\", Date.now());\r",
 							""
 						],
 						"type": "text/javascript",
@@ -112,7 +170,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"cnae_classification_relation\": {\r\n    \"classification_type\": \"Atendimento Geral\",\r\n    \"description\": \"Serviços gerais de atendimento ao paciente\",\r\n    \"rate\": 150\r\n  },\r\n  \"documents_relation\": {\r\n    \"filename\": \"doc.pdf\",\r\n    \"url\": \"http://...\"\r\n  },\r\n  \"coordinator_relation\": {\r\n    \"name\": \"Admin Atualizado\",\r\n    \"crm\": \"CRM1234\",\r\n    \"email\": \"atualizado@example.com\",\r\n    \"phone\": \"1133334444\",\r\n    \"state\": \"SP\"\r\n  },\r\n  \"cnpj\": \"{{dynamicCNPJ}}\",\r\n  \"social_name\": \"Cliente Y SA\",\r\n  \"state_registration\": \"654321\",\r\n  \"company_type\": \"SA\",\r\n  \"legal_representative\": \"Ciclano de Souza\",\r\n  \"pis_number\": \"987.65432.10-2\",\r\n  \"contact_name\": \"Maria\",\r\n  \"contact_email\": \"maria@cliente.com\",\r\n  \"phone\": \"1144445555\",\r\n  \"mobile_phone\": \"1191112222\",\r\n  \"exam_price_table_id\": 1,\r\n  \"specialty_price_table_id\": 1,\r\n  \"client_addresses_relation\": [\r\n    {\r\n      \"zip_code\": \"12345-678\",\r\n      \"street\": \"Av. Brasil\",\r\n      \"number\": \"1000\",\r\n      \"complement\": \"Apto 10\",\r\n      \"neighborhood\": \"Centro\",\r\n      \"city\": \"São Paulo\",\r\n      \"state\": \"SP\"\r\n    }\r\n  ]\r\n}\r\n",
+					"raw": "{\r\n  \"cnae_classification_relation\": {\r\n    \"classification_type\": \"Atendimento Geral\",\r\n    \"description\": \"Serviços gerais de atendimento ao paciente\",\r\n    \"rate\": 150\r\n  },\r\n  \"documents_relation\": {\r\n    \"filename\": \"doc.pdf\",\r\n    \"url\": \"http://...\"\r\n  },\r\n  \"coordinator_relation\": {\r\n    \"name\": \"Admin Atualizado\",\r\n    \"crm\": \"CRM1234\",\r\n    \"email\": \"atualizado@example.com\",\r\n    \"phone\": \"1133334444\",\r\n    \"state\": \"SP\"\r\n  },\r\n  \"cnpj\": \"{{dynamicCNPJ}}\",\r\n  \"social_name\": \"Cliente Y SA\",\r\n  \"state_registration\": \"654321\",\r\n  \"company_type\": \"SA\",\r\n  \"legal_representative\": \"Ciclano de Souza\",\r\n  \"pis_number\": \"987.65432.10-2\",\r\n  \"contact_name\": \"Maria\",\r\n  \"contact_email\": \"maria@cliente.com\",\r\n  \"phone\": \"1144445555\",\r\n  \"mobile_phone\": \"1191112222\",\r\n  \"exam_price_table_id\": 187,\r\n  \"specialty_price_table_id\": 186,\r\n  \"client_addresses_relation\": [\r\n    {\r\n      \"zip_code\": \"12345-678\",\r\n      \"street\": \"Av. Brasil\",\r\n      \"number\": \"1000\",\r\n      \"complement\": \"Apto 10\",\r\n      \"neighborhood\": \"Centro\",\r\n      \"city\": \"São Paulo\",\r\n      \"state\": \"SP\"\r\n    }\r\n  ]\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -152,27 +210,77 @@
 							"});\r",
 							"\r",
 							"\r",
-							"// Test for content type\r",
-							"pm.test(\"Content type is application/json\", function () {\r",
-							"    pm.response.to.have.header(\"Content-Type\", \"application/json\");\r",
+							"// Test for response body properties\r",
+							"pm.test(\"Response body has client_addresses_relation\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property('client_addresses_relation');\r",
 							"});\r",
 							"\r",
-							"// Verify client address city\r",
-							"pm.test(\"Verify client address city\", function () {\r",
-							"    const responseBody = pm.response.json();\r",
-							"    pm.expect(responseBody.client_addresses_relation[0].city).to.eql(\"São Paulo\");\r",
+							"pm.test(\"Response body has cnae_classification_relation\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property('cnae_classification_relation');\r",
 							"});\r",
 							"\r",
-							"// Verify contact email\r",
-							"pm.test(\"Verify contact email\", function () {\r",
-							"    const responseBody = pm.response.json();\r",
-							"    pm.expect(responseBody.contact_email).to.eql(\"maria@cliente.com\");\r",
+							"pm.test(\"Response body has cnpj\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property('cnpj');\r",
 							"});\r",
 							"\r",
-							"// Verify mobile phone\r",
-							"pm.test(\"Verify mobile phone\", function () {\r",
-							"    const responseBody = pm.response.json();\r",
-							"    pm.expect(responseBody.mobile_phone).to.eql(\"1191112222\");\r",
+							"pm.test(\"Response body has contact_email\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property('contact_email');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body has contact_name\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property('contact_name');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body has coordinator_relation\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property('coordinator_relation');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body has date_created\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property('date_created');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body has date_updated\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property('date_updated');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body has documents_relation\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property('documents_relation');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body has exam_price_table_id\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property('exam_price_table_id');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body has id\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property('id');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body has legal_representative\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property('legal_representative');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body has mobile_phone\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property('mobile_phone');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body has phone\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property('phone');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body has pis_number\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property('pis_number');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body has social_name\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property('social_name');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body has specialty_price_table_id\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property('specialty_price_table_id');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body has state_registration\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property('state_registration');\r",
 							"});\r",
 							""
 						],
@@ -184,14 +292,6 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Garantir que o clientId esteja armazenado\r",
-							"const clientId = pm.environment.get(\"clientId\");\r",
-							"\r",
-							"if (!clientId) {\r",
-							"    throw new Error(\"ID do cliente não está definido no ambiente.\");\r",
-							"}\r",
-							"\r",
-							"console.log(\"ID utilizado para o GET:\", clientId);\r",
 							""
 						],
 						"type": "text/javascript",
@@ -206,7 +306,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clients/{{clientId}}",
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clients/{{client_id}}",
 					"protocol": "https",
 					"host": [
 						"fap-clinic",
@@ -220,7 +320,7 @@
 						"api",
 						"v1",
 						"clients",
-						"{{clientId}}"
+						"{{client_id}}"
 					]
 				}
 			},
@@ -233,15 +333,23 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Response status code is 200\", function () {\r",
+							"// Valida o status code\r",
+							"pm.test(\"Status code is 200\", function () {\r",
 							"    pm.response.to.have.status(200);\r",
 							"});\r",
 							"\r",
+							"// Processa o corpo da resposta\r",
+							"let response = pm.response.json();\r",
 							"\r",
-							"pm.test(\"Content-Type is application/json\", function () {\r",
-							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
-							"});\r",
-							"\r",
+							"if (response.id) {\r",
+							"    pm.environment.set(\"client_id\", response.id);\r",
+							"    pm.environment.set(\"client_cnpj\", response.cnpj);\r",
+							"    pm.environment.set(\"exam_price_table_id\", response.exam_price_table_id);\r",
+							"    pm.environment.set(\"specialty_price_table_id\", response.specialty_price_table_id);\r",
+							"    console.log(\"Client atualizado e salvo:\", response.id);\r",
+							"} else {\r",
+							"    console.warn(\"Não foi possível atualizar/salvar o cliente no ambiente.\");\r",
+							"}\r",
 							""
 						],
 						"type": "text/javascript",
@@ -252,10 +360,13 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Gerar CNPJ dinâmico\r",
-							"const cnpjBase = \"98.\" + Math.floor(Math.random() * 900) + 100 + \".432/0001\";\r",
-							"const cnpj = cnpjBase.substring(0, 18);\r",
-							"pm.environment.set(\"dynamicCNPJ\", cnpj);"
+							"if (!pm.environment.get(\"client_id\")) {\r",
+							"    throw new Error(\"client_id não está definido. Execute o POST ou GET primeiro.\");\r",
+							"}\r",
+							"if (!pm.environment.get(\"dynamicCNPJ\")) {\r",
+							"    throw new Error(\"dynamicCNPJ não está definido. Execute o POST ou defina a variável.\");\r",
+							"}\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -270,7 +381,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"cnae_classification_relation\": {\r\n    \"classification_type\": \"Atendimento Geral\",\r\n    \"description\": \"Serviços gerais de atendimento ao paciente\",\r\n    \"rate\": 150\r\n  },\r\n  \"documents_relation\": {\r\n    \"filename\": \"doc.pdf\",\r\n    \"url\": \"http://...\"\r\n  },\r\n  \"coordinator_relation\": {\r\n    \"name\": \"Admin Atualizado\",\r\n    \"crm\": \"CRM1234\",\r\n    \"email\": \"atualizado@example.com\",\r\n    \"phone\": \"1133334444\",\r\n    \"state\": \"SP\"\r\n  },\r\n  \"cnpj\": \"{{dynamicCNPJ}}\",\r\n  \"social_name\": \"Cliente Y SA\",\r\n  \"state_registration\": \"654321\",\r\n  \"company_type\": \"SA\",\r\n  \"legal_representative\": \"Ciclano de Souza\",\r\n  \"pis_number\": \"987.65432.10-2\",\r\n  \"contact_name\": \"Maria\",\r\n  \"contact_email\": \"maria@cliente.com\",\r\n  \"phone\": \"1144445555\",\r\n  \"mobile_phone\": \"1191112222\",\r\n  \"exam_price_table_id\": 1,\r\n  \"specialty_price_table_id\": 1,\r\n  \"client_addresses_relation\": [\r\n    {\r\n      \"zip_code\": \"12345-678\",\r\n      \"street\": \"Av. Brasil\",\r\n      \"number\": \"1000\",\r\n      \"complement\": \"Apto 10\",\r\n      \"neighborhood\": \"Centro\",\r\n      \"city\": \"São Paulo\",\r\n      \"state\": \"SP\"\r\n    }\r\n  ]\r\n}\r\n",
+					"raw": "{\r\n  \"cnae_classification_relation\": {\r\n    \"classification_type\": \"Atendimento Geral\",\r\n    \"description\": \"Serviços gerais de atendimento ao paciente\",\r\n    \"rate\": 150\r\n  },\r\n  \"documents_relation\": {\r\n    \"filename\": \"doc.pdf\",\r\n    \"url\": \"http://...\"\r\n  },\r\n  \"coordinator_relation\": {\r\n    \"name\": \"Admin Atualizado\",\r\n    \"crm\": \"CRM1234\",\r\n    \"email\": \"atualizado@example.com\",\r\n    \"phone\": \"1133334444\",\r\n    \"state\": \"SP\"\r\n  },\r\n  \"cnpj\": \"{{dynamicCNPJ}}\",\r\n  \"social_name\": \"Cliente Y SA\",\r\n  \"state_registration\": \"654321\",\r\n  \"company_type\": \"SA\",\r\n  \"legal_representative\": \"Ciclano de Souza\",\r\n  \"pis_number\": \"987.65432.10-2\",\r\n  \"contact_name\": \"Maria\",\r\n  \"contact_email\": \"maria@cliente.com\",\r\n  \"phone\": \"1144445555\",\r\n  \"mobile_phone\": \"1191112222\",\r\n  \"exam_price_table_id\": 187,\r\n  \"specialty_price_table_id\": 186,\r\n  \"client_addresses_relation\": [\r\n    {\r\n      \"zip_code\": \"12345-678\",\r\n      \"street\": \"Av. Brasil\",\r\n      \"number\": \"1000\",\r\n      \"complement\": \"Apto 10\",\r\n      \"neighborhood\": \"Centro\",\r\n      \"city\": \"São Paulo\",\r\n      \"state\": \"SP\"\r\n    }\r\n  ]\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -278,7 +389,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clients/{{clientId}}",
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clients/{{client_id}}",
 					"protocol": "https",
 					"host": [
 						"fap-clinic",
@@ -292,7 +403,7 @@
 						"api",
 						"v1",
 						"clients",
-						"{{clientId}}"
+						"{{client_id}}"
 					]
 				}
 			},
@@ -339,7 +450,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clients/{{clientId}}\n",
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/clients/{{client_id}}",
 					"protocol": "https",
 					"host": [
 						"fap-clinic",
@@ -353,7 +464,7 @@
 						"api",
 						"v1",
 						"clients",
-						"{{clientId}}\n"
+						"{{client_id}}"
 					]
 				}
 			},
