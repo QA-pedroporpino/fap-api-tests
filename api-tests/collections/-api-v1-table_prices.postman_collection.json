@@ -26,29 +26,38 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Geração Dinâmica de Dados\r",
-							"let timestamp = new Date().getTime();\r",
-							"let tableName = \"Tabela_\" + timestamp;\r",
-							"let type = \"SPECIALTY\"; // Mantendo fixo para simplificação\r",
-							"\r",
-							"// Salvar no ambiente\r",
-							"pm.environment.set(\"table_name\", tableName);\r",
-							"pm.environment.set(\"table_type\", type);\r",
-							"\r",
-							"console.log(\"Nome da Tabela gerado: \" + tableName);\r",
-							"console.log(\"Tipo da Tabela: \" + type);"
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
 					}
 				}
 			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
 				"auth": {
-					"type": "noauth"
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
 				},
 				"method": "GET",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
 					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/table_prices",
 					"protocol": "https",
@@ -347,7 +356,11 @@
 					"type": "noauth"
 				},
 				"method": "DELETE",
-				"body": {},
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
 				"url": {
 					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/table_prices/{{tablePriceID}}",
 					"protocol": "https",
@@ -368,6 +381,38 @@
 				}
 			},
 			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{bearer_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }

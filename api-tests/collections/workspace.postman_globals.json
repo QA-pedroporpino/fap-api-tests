@@ -1,0 +1,15 @@
+{
+	"id": "e658d021-3996-4574-8261-2ccefc6c736c",
+	"values": [
+		{
+			"key": "bearer_token",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		}
+	],
+	"name": "Globals",
+	"_postman_variable_scope": "globals",
+	"_postman_exported_at": "2025-05-23T17:08:32.661Z",
+	"_postman_exported_using": "Postman/11.46.4"
+}
