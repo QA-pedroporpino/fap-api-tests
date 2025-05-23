@@ -1,65 +1,86 @@
 {
-	"info": {
-		"_postman_id": "1861e92d-05fb-44f0-8f34-c692dac4d024",
-		"name": "/auth/login/",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "37354928"
-	},
-	"item": [
-		{
-			"name": "Teste de Login - 200 ok",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"if (pm.response.code === 200) {\r",
-							"    const jsonData = pm.response.json();\r",
-							"    pm.collectionVariables.set(\"bearer_token\", jsonData.user.auth_token);\r",
-							"}\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"email\": \"pedroporpino@id.uff.br\",\r\n  \"password\": \"fapclinica\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/auth/login",
-					"protocol": "https",
-					"host": [
-						"fap-clinic",
-						"stage",
-						"b2b",
-						"kompa",
-						"com",
-						"br"
-					],
-					"path": [
-						"auth",
-						"login"
-					]
-				}
-			},
-			"response": []
-		}
-	],
-	"variable": [
-		{
-			"key": "bearer_token",
-			"value": ""
-		}
-	]
+  "info": {
+    "_postman_id": "1861e92d-05fb-44f0-8f34-c692dac4d024",
+    "name": "/auth/login/",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "37354928"
+  },
+  "item": [
+    {
+      "name": "Teste de Login - 200 ok",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {\r",
+              "    const jsonData = pm.response.json();\r",
+              "    pm.collectionVariables.set(\"bearer_token\", jsonData.user.auth_token);\r",
+              "}\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"pedroporpino@id.uff.br\",\r\n  \"password\": \"fapclinica\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://fap-clinic.stage.b2b.kompa.com.br/auth/login",
+          "protocol": "https",
+          "host": [
+            "fap-clinic",
+            "stage",
+            "b2b",
+            "kompa",
+            "com",
+            "br"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "bearer_token",
+      "value": ""
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "// Script global para adicionar o token de autorização",
+          "const token = pm.globals.get('bearer_token');",
+          "if (!token) {",
+          "    console.error('Token não encontrado nas variáveis globais');",
+          "    return;",
+          "}",
+          "pm.request.headers.add({",
+          "    key: 'Authorization',",
+          "    value: `Bearer ${token}`",
+          "});",
+          "console.log('Token adicionado ao header:', token);"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ]
 }
