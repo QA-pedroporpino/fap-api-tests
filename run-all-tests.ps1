@@ -35,15 +35,15 @@ node api-tests/run-tests.js "-auth-login-.postman_collection.json"
 if ($LASTEXITCODE -eq 0) {
     Write-Host "`nLogin successful! Running all collections..." -ForegroundColor Green
 
-    # Run each collection
-    foreach ($collection in $collections) {
-        Write-Host "`nRunning collection: $collection`n" -ForegroundColor Yellow
+# Run each collection
+foreach ($collection in $collections) {
+    Write-Host "`nRunning collection: $collection`n" -ForegroundColor Yellow
         newman run $collection -g "api-tests/collections/workspace.postman_globals.json" -r cli
-    }
+}
 
-    Write-Host "`n===============================================" -ForegroundColor Green
-    Write-Host "All tests have been executed!" -ForegroundColor Green
-    Write-Host "===============================================" -ForegroundColor Green
+Write-Host "`n===============================================" -ForegroundColor Green
+Write-Host "All tests have been executed!" -ForegroundColor Green
+Write-Host "===============================================" -ForegroundColor Green 
 } else {
     Write-Host "`nLogin failed! Please check your credentials and try again." -ForegroundColor Red
     exit 1
