@@ -98,7 +98,7 @@
 							"const response = pm.response.json();\r",
 							"\r",
 							"if (response.id) {\r",
-							"    pm.environment.set(\"price_id\", response.id);\r",
+							"    pm.collectionVariables.set(\"price_id\", response.id);\r",
 							"    console.log(`Exam Price criado com ID: ${response.id}`);\r",
 							"} else {\r",
 							"    console.warn(\"Exam Price ID não encontrado na resposta.\");\r",
@@ -116,7 +116,7 @@
 					"script": {
 						"exec": [
 							"const timestamp = Date.now();\r",
-							"pm.environment.set(\"timestamp\", timestamp);\r",
+							"pm.collectionVariables.set(\"timestamp\", timestamp);\r",
 							"console.log(`Timestamp gerado: ${timestamp}`);\r"
 						],
 						"type": "text/javascript",
@@ -417,6 +417,28 @@
 					""
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"key": "selected_exam_id",
+			"value": ""
+		},
+		{
+			"key": "selected_table_price_id",
+			"value": ""
+		},
+		{
+			"key": "timestamp",
+			"value": ""
+		},
+		{
+			"key": "created_exam_price_id",
+			"value": ""
+		},
+		{
+			"key": "price_id",
+			"value": ""
 		}
 	]
 }
