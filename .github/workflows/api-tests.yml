@@ -22,9 +22,12 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install Dependencies
-        run: |
-          npm install -g newman newman-reporter-htmlextra
+      - name: Install Newman globally
+        run: npm install -g newman newman-reporter-htmlextra
+
+      - name: Install Node.js dependencies
+        run: npm install
+        working-directory: ./api-tests
 
       - name: Run All Postman Collections (PowerShell)
         shell: pwsh
