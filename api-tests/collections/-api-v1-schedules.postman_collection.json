@@ -459,7 +459,16 @@
 				"type": "text/javascript",
 				"packages": {},
 				"exec": [
-					""
+					"const token = pm.globals.get('bearer_token');",
+					"",
+					"if (token) {",
+					"    pm.request.headers.upsert({",
+					"        key: 'Authorization',",
+					"        value: `Bearer ${token}`",
+					"    });",
+					"} else {",
+					"    console.warn('Token não encontrado na variável global.');",
+					"}"
 				]
 			}
 		},

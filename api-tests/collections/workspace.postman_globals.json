@@ -3,13 +3,13 @@
     "values": [
         {
             "key": "bearer_token",
-            "value": ".eJxdj81qAzEMhN_F5xDosXvqe5RiFFubFfhHSHLSEPLulUta2Nw0o9F86B4oh-X97RCwApWwBMYsnbswtf5B-TjW9XiScAh2Y5x76SuqUm9Q3GWUSr9Sw_IZMuh26iA5Vmhwxnm4UoOWCMrTq9jM7VSoUYqKNngWeS8VjENR9kFNG-bhqwvh1TUwd2oWkzNHMTCHu10xU3KIYOqSZ84M0uZ6pjTiN1R9gv4eiP_dOyJ7p09-eiY1eSUo43zHbq-Bidh7X48fUiKEBQ.aDC84A.-vD6o3JlbJuhRX2dL1jfftsKJrM",
+            "value": ".eJxdj81qAzEMhN_F5xDosXvqe5RiFFubFfhHSHLSEPLulUta2Nw0o9F86B4oh-X97RCwApWwBMYsnbswtf5B-TjW9XiScAh2Y5x76SuqUm9Q3GWUSr9Sw_IZMuh26iA5Vmhwxnm4UoOWCMrTq9jM7VSoUYqKNngWeS8VjENR9kFNG-bhqwvh1TUwd2oWkzNHMTCHu10xU3KIYOqSZ84M0uZ6pjTiN1R9gv4eiP_dOyJ7p09-eiY1eSUo43zHbq-Bidh7X48fUiKEBQ.aDC_qQ.DCx8pqplRPu3o5gntI-F65x7HVY",
             "type": "any",
             "enabled": true
         }
     ],
     "name": "Globals",
     "_postman_variable_scope": "globals",
-    "_postman_exported_at": "2025-05-23T18:22:15.816Z",
+    "_postman_exported_at": "2025-05-23T18:34:09.020Z",
     "_postman_exported_using": "Postman/11.46.4"
 }
