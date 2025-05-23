@@ -9,9 +9,8 @@ if (-not (Test-Path $reportsPath)) {
     New-Item -ItemType Directory -Path $reportsPath
 }
 
-# Collections to run
+# Collections to run (excluding login collection since we'll handle it separately)
 $collections = @(
-    "api-tests/collections/-auth-login-.postman_collection.json",
     "api-tests/collections/-api-v1-certificates.postman_collection.json",
     "api-tests/collections/-api-v1-clients.postman_collection.json",
     "api-tests/collections/-api-v1-clinics.postman_collection.json",
@@ -28,15 +27,24 @@ $collections = @(
     "api-tests/collections/-api-v1-table_prices.postman_collection.json"
 )
 
-# Run all collections
-Write-Host "`nRunning all collections..." -ForegroundColor Green
+# First, run the login script
+Write-Host "`nExecuting login to get fresh token..." -ForegroundColor Green
+node api-tests/run-tests.js "-auth-login-.postman_collection.json"
 
-# Run each collection
-foreach ($collection in $collections) {
-    Write-Host "`nRunning collection: $collection`n" -ForegroundColor Yellow
-    newman run $collection -g "api-tests/collections/workspace.postman_globals.json" -r cli
-}
+# Check if login was successful
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "`nLogin successful! Running all collections..." -ForegroundColor Green
 
-Write-Host "`n===============================================" -ForegroundColor Green
-Write-Host "All tests have been executed!" -ForegroundColor Green
-Write-Host "===============================================" -ForegroundColor Green 
+    # Run each collection
+    foreach ($collection in $collections) {
+        Write-Host "`nRunning collection: $collection`n" -ForegroundColor Yellow
+        newman run $collection -g "api-tests/collections/workspace.postman_globals.json" -r cli
+    }
+
+    Write-Host "`n===============================================" -ForegroundColor Green
+    Write-Host "All tests have been executed!" -ForegroundColor Green
+    Write-Host "===============================================" -ForegroundColor Green
+} else {
+    Write-Host "`nLogin failed! Please check your credentials and try again." -ForegroundColor Red
+    exit 1
+} 
