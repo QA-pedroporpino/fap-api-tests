@@ -395,6 +395,10 @@
 				"type": "text/javascript",
 				"packages": {},
 				"exec": [
+					"pm.request.headers.add({\r",
+					"    key: 'Authorization',\r",
+					"    value: 'Bearer ' + pm.globals.get('bearer_token')\r",
+					"});\r",
 					""
 				]
 			}
