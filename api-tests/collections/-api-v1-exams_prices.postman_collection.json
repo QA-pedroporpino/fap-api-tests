@@ -20,10 +20,7 @@
 							"pm.test(\"Response contém o campo num_results\", function () {\r",
 							"    let jsonData = pm.response.json();\r",
 							"    pm.expect(jsonData).to.have.property(\"num_results\");\r",
-							"});\r",
-							"\r",
-							"// Log para debug\r",
-							"console.log(\"GET /api/v1/exam_prices - Status: \", pm.response.code);\r"
+							"});"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -39,7 +36,8 @@
 							"pm.environment.unset(\"table_price_id\");\r",
 							"pm.environment.unset(\"timestamp\");\r",
 							"\r",
-							"console.log(\"IDs e Timestamp resetados.\");\r"
+							"console.log(\"IDs e Timestamp resetados.\");\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -103,9 +101,7 @@
 							"} else {\r",
 							"    console.warn(\"Exam Price ID não encontrado na resposta.\");\r",
 							"}\r",
-							"\r",
-							"// Log para debug\r",
-							"console.log(\"POST /api/v1/exam_prices - Status: \", pm.response.code);\r"
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -117,7 +113,7 @@
 						"exec": [
 							"const timestamp = Date.now();\r",
 							"pm.collectionVariables.set(\"timestamp\", timestamp);\r",
-							"console.log(`Timestamp gerado: ${timestamp}`);\r"
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -171,9 +167,7 @@
 							"});\r",
 							"\r",
 							"console.log(\"Exam Price obtido com sucesso.\");\r",
-							"\r",
-							"// Log para debug\r",
-							"console.log(\"GET /api/v1/exam_prices/{{price_id}} - Status: \", pm.response.code);\r"
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -247,10 +241,7 @@
 							"pm.test(\"Validar Título Atualizado\", function () {\r",
 							"    let expectedTitle = \"Consulta com Exames Atualizada \" + pm.environment.get(\"timestamp\");\r",
 							"    pm.expect(response.title).to.equal(expectedTitle);\r",
-							"});\r",
-							"\r",
-							"// Log para debug\r",
-							"console.log(\"PUT /api/v1/exam_prices/{{price_id}} - Status: \", pm.response.code);\r"
+							"});"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -324,10 +315,10 @@
 							"    pm.expect(pm.response.code).to.eql(204);\r",
 							"});\r",
 							"\r",
-							"console.log(\"Exam Price excluído com sucesso.\");\r",
+							"pm.environment.unset(\"price_id\");\r",
 							"\r",
-							"// Log para debug\r",
-							"console.log(\"DELETE /api/v1/exam_prices/{{price_id}} - Status: \", pm.response.code);\r"
+							"console.log(\"✅ Exam Price deletado e variável 'price_id' removida do ambiente.\");\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
