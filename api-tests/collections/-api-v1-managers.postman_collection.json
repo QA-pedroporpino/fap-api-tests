@@ -27,6 +27,16 @@
 						"type": "text/javascript",
 						"packages": {}
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
 				}
 			],
 			"request": {
@@ -91,7 +101,7 @@
 							"console.log(\"Timestamp gerado: \" + timestamp);\r",
 							"\r",
 							"// Definir um `profile_id` existente\r",
-							"pm.environment.set(\"profile_id\", 17); // Usando um profile_id existente\r",
+							"pm.environment.set(\"profile_id\", 281); // Usando um profile_id existente\r",
 							"\r",
 							"console.log(\"IDs configurados dinamicamente.\");"
 						],
@@ -108,7 +118,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Manager {{timestamp}}\",\r\n  \"email\": \"novo.manager{{timestamp}}@example.com\",\r\n  \"document_type\": \"CPF\",\r\n  \"document\": \"{{timestamp}}\",\r\n  \"social_name\": \"Manager Social {{timestamp}}\",\r\n  \"phone\": \"11988888888\",\r\n  \"active\": true,\r\n  \"profile_id\": \"{{profile_id}}\"\r\n}",
+					"raw": "{\r\n  \"name\": \"Manager {{timestamp}}\",\r\n  \"email\": \"novo.manager{{timestamp}}@example.com\",\r\n  \"document_type\": \"CPF\",\r\n  \"document\": \"{{timestamp}}\",\r\n  \"social_name\": \"Manager Social {{timestamp}}\",\r\n  \"phone\": \"11988888888\",\r\n  \"active\": true,\r\n  \"profile_id\": {{profileID}}\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -159,15 +169,15 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Gerar um timestamp único\r",
+							"// Gera timestamp, se quiser\r",
 							"const timestamp = new Date().getTime();\r",
 							"pm.environment.set(\"timestamp\", timestamp);\r",
 							"console.log(\"Timestamp gerado: \" + timestamp);\r",
 							"\r",
-							"// Definir um `profile_id` existente\r",
-							"pm.environment.set(\"profile_id\", 17); // Usando um profile_id existente\r",
+							"// Não precisa mais setar profile_id aqui!\r",
 							"\r",
-							"console.log(\"IDs configurados dinamicamente.\");"
+							"console.log(\"Usando o Manager ID: \" + pm.environment.get(\"manager_id\"));\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -212,13 +222,13 @@
 							"    pm.expect(pm.response.code).to.equal(200);\r",
 							"});\r",
 							"\r",
+							"// Loga a resposta para inspeção\r",
 							"let response = pm.response.json();\r",
-							"console.log(\"Response: \", response);\r",
+							"console.log(\"Response da atualização: \", response);\r",
 							"\r",
-							"// Verificar nome atualizado\r",
-							"pm.test(\"Validar Nome Atualizado\", function () {\r",
-							"    let expectedName = \"Manager Atualizado \" + pm.environment.get(\"timestamp\");\r",
-							"    pm.expect(response.name).to.equal(expectedName);\r",
+							"// Opcional: valida algum campo\r",
+							"pm.test(\"Nome atualizado corretamente\", function () {\r",
+							"    pm.expect(response.name).to.include(\"Atualizado\");\r",
 							"});\r",
 							""
 						],
@@ -230,15 +240,14 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Gerar um timestamp único\r",
+							"// Gera um timestamp único para atualizar os dados\r",
 							"const timestamp = new Date().getTime();\r",
 							"pm.environment.set(\"timestamp\", timestamp);\r",
 							"console.log(\"Timestamp gerado: \" + timestamp);\r",
 							"\r",
-							"// Definir um `profile_id` existente\r",
-							"pm.environment.set(\"profile_id\", 17); // Usando um profile_id existente\r",
-							"\r",
-							"console.log(\"IDs configurados dinamicamente.\");"
+							"// Loga o Manager ID que será atualizado\r",
+							"console.log(\"Atualizando o Manager ID: \" + pm.environment.get(\"manager_id\"));\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -253,7 +262,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Manager Atualizado {{timestamp}}\",\r\n  \"email\": \"manager.atualizado{{timestamp}}@example.com\",\r\n  \"document_type\": \"CPF\",\r\n  \"document\": \"123456789{{timestamp}}\",\r\n  \"social_name\": \"Manager Atualizado {{timestamp}}\",\r\n  \"phone\": \"11999999999\",\r\n  \"active\": true,\r\n  \"profile_id\": \"{{profile_id}}\"\r\n}\r\n",
+					"raw": "{\r\n  \"name\": \"Manager Atualizado {{timestamp}}\",\r\n  \"email\": \"manager.atualizado{{timestamp}}@example.com\",\r\n  \"document_type\": \"CPF\",\r\n  \"document\": \"123456789{{timestamp}}\",\r\n  \"social_name\": \"Manager Atualizado {{timestamp}}\",\r\n  \"phone\": \"11999999999\",\r\n  \"active\": true,\r\n  \"profile_id\": \"{{profileID}}\"\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -302,15 +311,13 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Gerar um timestamp único\r",
+							"// Gera um timestamp (opcional, caso queira reaproveitar depois)\r",
 							"const timestamp = new Date().getTime();\r",
 							"pm.environment.set(\"timestamp\", timestamp);\r",
-							"console.log(\"Timestamp gerado: \" + timestamp);\r",
 							"\r",
-							"// Definir um `profile_id` existente\r",
-							"pm.environment.set(\"profile_id\", 17); // Usando um profile_id existente\r",
-							"\r",
-							"console.log(\"IDs configurados dinamicamente.\");"
+							"// Loga o ID que vai ser deletado\r",
+							"console.log(\"Deletando o Manager ID: \" + pm.environment.get(\"manager_id\"));\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}

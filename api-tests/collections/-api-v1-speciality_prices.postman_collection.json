@@ -122,9 +122,9 @@
 							"const timestamp = new Date().getTime();\r",
 							"pm.environment.set(\"timestamp\", timestamp);\r",
 							"\r",
-							"// Definir IDs para `table_price_id` e `specialty_id` - ajuste conforme o GET mais recente\r",
-							"pm.environment.set(\"table_price_id\", 1);  // Verificar se existe\r",
-							"pm.environment.set(\"specialty_id\", 1);    // Verificar se existe\r",
+							"// Definir IDs válidos conforme o GET mais recente\r",
+							"pm.environment.set(\"table_price_id\", 186);  // EXISTENTE\r",
+							"pm.environment.set(\"specialty_id\", 1);      // EXISTENTE\r",
 							"\r",
 							"console.log(\"IDs configurados: table_price_id = \" + pm.environment.get(\"table_price_id\") + \" | specialty_id = \" + pm.environment.get(\"specialty_id\"));\r",
 							""
@@ -142,7 +142,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"table_price_id\": 2,\r\n  \"specialty_id\": 1,\r\n  \"title\": \"Consulta com Especialista {{timestamp}}\",\r\n  \"sla\": 72,\r\n  \"price\": 350\r\n}\r\n",
+					"raw": "{\r\n  \"table_price_id\": {{table_price_id}},\r\n  \"specialty_id\": {{specialty_id}},\r\n  \"title\": \"Consulta com Especialista {{timestamp}}\",\r\n  \"sla\": 72,\r\n  \"price\": 350\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -193,6 +193,13 @@
 						],
 						"type": "text/javascript",
 						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"packages": {},
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -259,11 +266,16 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Gerar timestamp para garantir dados únicos\r",
+							"// Gera um timestamp único para atualizar o registro\r",
 							"const timestamp = new Date().getTime();\r",
 							"pm.environment.set(\"timestamp\", timestamp);\r",
 							"\r",
-							"console.log(\"Timestamp gerado para PUT: \" + timestamp);\r",
+							"// Mantém os IDs válidos que foram usados na criação\r",
+							"pm.environment.set(\"table_price_id\", 186);  // Já existe\r",
+							"pm.environment.set(\"specialty_id\", 1);      // Já existe\r",
+							"\r",
+							"console.log(\"Atualizando Specialty Price ID: \" + pm.environment.get(\"specialtyPriceID\"));\r",
+							"console.log(\"IDs configurados: table_price_id = \" + pm.environment.get(\"table_price_id\") + \" | specialty_id = \" + pm.environment.get(\"specialty_id\"));\r",
 							""
 						],
 						"type": "text/javascript",
@@ -279,7 +291,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"table_price_id\": 2,\r\n  \"specialty_id\": 1,\r\n  \"title\": \"Consulta com Especialista Atualizada {{timestamp}}\",\r\n  \"sla\": 48,\r\n  \"price\": 450\r\n}\r\n",
+					"raw": "{\r\n  \"table_price_id\": {{table_price_id}},\r\n  \"specialty_id\": {{specialty_id}},\r\n  \"title\": \"Consulta Especialista Atualizada {{timestamp}}\",\r\n  \"sla\": 48,\r\n  \"price\": 400\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -330,26 +342,13 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Geração Dinâmica de Dados\r",
-							"let timestamp = new Date().getTime();\r",
-							"let title = \"Consulta com Especialista \" + timestamp;\r",
-							"let price = Math.floor(Math.random() * 500) + 100; // Preço aleatório entre 100 e 600\r",
-							"let sla = 72; // SLA fixo para simplificação\r",
-							"let tablePriceID = 1; // Mantendo fixo para garantir criação\r",
-							"let specialtyID = 1; // Especialidade padrão\r",
+							"// Gera timestamp (opcional, pra manter padrão)\r",
+							"const timestamp = new Date().getTime();\r",
+							"pm.environment.set(\"timestamp\", timestamp);\r",
 							"\r",
-							"// Salvar no ambiente\r",
-							"pm.environment.set(\"title\", title);\r",
-							"pm.environment.set(\"price\", price);\r",
-							"pm.environment.set(\"sla\", sla);\r",
-							"pm.environment.set(\"table_price_id\", tablePriceID);\r",
-							"pm.environment.set(\"specialty_id\", specialtyID);\r",
-							"\r",
-							"console.log(\"Título gerado: \" + title);\r",
-							"console.log(\"Preço: \" + price);\r",
-							"console.log(\"SLA: \" + sla);\r",
-							"console.log(\"Table Price ID: \" + tablePriceID);\r",
-							"console.log(\"Specialty ID: \" + specialtyID);"
+							"// Loga o ID que será deletado\r",
+							"console.log(\"Deletando Specialty Price ID: \" + pm.environment.get(\"specialtyPriceID\"));\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
