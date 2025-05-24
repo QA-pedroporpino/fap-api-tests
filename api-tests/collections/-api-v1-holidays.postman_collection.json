@@ -248,18 +248,10 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"if (pm.response.code === 204) {\r",
-							"    console.log(\"Feriado deletado com sucesso.\");\r",
-							"    pm.environment.unset(\"holidayId\");\r",
-							"    pm.environment.unset(\"holidayDate\");\r",
-							"    pm.environment.unset(\"holidayName\");\r",
-							"} else {\r",
-							"    console.log(\"Erro ao deletar o feriado. Código:\", pm.response.code);\r",
-							"}\r",
-							"\r",
-							"pm.test(\"Response status code is 204\", function () {\r",
+							"pm.test(\"Verificar status 204 - Feriado Deletado\", function () {\r",
 							"    pm.expect(pm.response.code).to.equal(204);\r",
 							"});\r",
+							"\r",
 							""
 						],
 						"type": "text/javascript",
