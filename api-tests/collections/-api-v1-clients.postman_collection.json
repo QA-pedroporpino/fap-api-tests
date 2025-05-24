@@ -429,10 +429,7 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Verifica se o clientId foi salvo no ambiente\r",
-							"if (!pm.environment.get(\"clientId\")) {\r",
-							"    throw new Error(\"clientId não encontrado. Execute o POST primeiro.\");\r",
-							"}"
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
