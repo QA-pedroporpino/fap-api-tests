@@ -95,5 +95,12 @@
 				]
 			}
 		}
+	],
+	"variable": [
+		{
+			"key": "bearer_token",
+			"value": "",
+			"type": "string"
+		}
 	]
 }
