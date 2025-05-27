@@ -101,7 +101,7 @@
 							"console.log(\"Timestamp gerado: \" + timestamp);\r",
 							"\r",
 							"// Definir um `profile_id` existente\r",
-							"pm.environment.set(\"profile_id\", 281); // Usando um profile_id existente\r",
+							"pm.environment.set(\"profileID\", 281); // Usando um profile_id existente\r",
 							"\r",
 							"console.log(\"IDs configurados dinamicamente.\");"
 						],
