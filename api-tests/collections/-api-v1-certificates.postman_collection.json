@@ -17,13 +17,6 @@
 							"    pm.expect(pm.response.code).to.equal(200);\r",
 							"});\r",
 							"\r",
-							"pm.test(\"Verificar estrutura da resposta de Health\", function () {\r",
-							"    let responseJson = pm.response.json();\r",
-							"    pm.expect(responseJson).to.have.property(\"success\");\r",
-							"    pm.expect(responseJson.success).to.be.a(\"boolean\");\r",
-							"    pm.expect(responseJson.success).to.be.true;\r",
-							"    console.log(\"Health Check - Resposta: \" + JSON.stringify(responseJson));\r",
-							"});\r",
 							""
 						],
 						"type": "text/javascript",
@@ -45,7 +38,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/health",
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/certificates",
 					"protocol": "https",
 					"host": [
 						"fap-clinic",
@@ -58,7 +51,7 @@
 					"path": [
 						"api",
 						"v1",
-						"health"
+						"certificates"
 					]
 				}
 			},
@@ -70,7 +63,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "{{bearer_token}}\n",
+				"value": "{{bearer_token}}",
 				"type": "string"
 			}
 		]

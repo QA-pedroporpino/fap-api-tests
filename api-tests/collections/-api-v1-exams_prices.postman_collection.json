@@ -372,7 +372,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "{{bearer_token}}\n",
+				"value": "{{bearer_token}}",
 				"type": "string"
 			}
 		]
@@ -430,6 +430,11 @@
 		{
 			"key": "price_id",
 			"value": ""
+		},
+		{
+			"key": "bearer_token",
+			"value": "",
+			"type": "string"
 		}
 	]
 }
