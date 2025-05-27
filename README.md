@@ -1,38 +1,51 @@
 # FAP API Tests
 
-Este repositório contém testes automatizados para as APIs do sistema FAP, utilizando Postman e Newman para execução.
+Este repositório contém as coleções de testes de API para o projeto FAP.
+
+## Coleções Disponíveis
+
+- `-api-v1-certificates.postman_collection.json` - Testes de certificados
+- `-api-v1-clients.postman_collection.json` - Testes de clientes
+- `-api-v1-clinics.postman_collection.json` - Testes de clínicas
+- `-api-v1-exams.postman_collection.json` - Testes de exames
+- `-api-v1-exams_prices.postman_collection.json` - Testes de preços de exames
+- `-api-v1-health.postman_collection.json` - Testes de saúde
+- `-api-v1-holidays.postman_collection.json` - Testes de feriados
+- `-api-v1-managers.postman_collection.json` - Testes de gerentes
+- `-api-v1-patients.postman_collection.json` - Testes de pacientes
+- `-api-v1-profiles.postman_collection.json` - Testes de perfis
+- `-api-v1-professionals.postman_collection.json` - Testes de profissionais
+- `-api-v1-schedules.postman_collection.json` - Testes de agendamentos
+- `-api-v1-speciality_prices.postman_collection.json` - Testes de preços de especialidades
+- `-api-v1-specialties.postman_collection.json` - Testes de especialidades
+- `-api-v1-table_prices.postman_collection.json` - Testes de tabelas de preços
+
+## Como Executar os Testes
+
+1. Instale as dependências:
+   ```sh
+   npm install
+   ```
+
+2. Execute o script de login para obter um token válido:
+   ```sh
+   node api-tests/run-tests.js "-auth-login-.postman_collection.json"
+   ```
+
+3. Execute todos os testes:
+   ```sh
+   ./run-all-tests.ps1
+   ```
+
+## Workflow de CI/CD
+
+Os testes são executados automaticamente a cada push ou pull request para a branch `main` através do GitHub Actions.
 
 ## Estrutura do Projeto
 
-```
-.
-├── .github/
-│   └── workflows/
-│       └── api-tests.yml
-├── api-tests/
-│   ├── collections/
-│   │   ├── -auth-login-.postman_collection.json
-│   │   ├── -api-v1-certificates.postman_collection.json
-│   │   ├── -api-v1-clients.postman_collection.json
-│   │   ├── -api-v1-clinics.postman_collection.json
-│   │   ├── -api-v1-exams.postman_collection.json
-│   │   ├── -api-v1-exams_prices.postman_collection.json
-│   │   ├── -api-v1-health.postman_collection.json
-│   │   ├── -api-v1-holidays.postman_collection.json
-│   │   ├── -api-v1-managers.postman_collection.json
-│   │   ├── -api-v1-profiles.postman_collection.json
-│   │   ├── -api-v1-professionals.postman_collection.json
-│   │   ├── -api-v1-schedules.postman_collection.json
-│   │   ├── -api-v1-speciality_prices.postman_collection.json
-│   │   ├── -api-v1-specialties.postman_collection.json
-│   │   ├── -api-v1-table_prices.postman_collection.json
-│   │   └── workspace.postman_globals.json
-│   ├── environments/
-│   ├── reports/
-│   ├── run-tests.js
-│   └── run-collections.js
-└── run-all-tests.ps1
-```
+- `api-tests/collections/` - Coleções de testes do Postman
+- `api-tests/reports/` - Relatórios gerados pelos testes
+- `.github/workflows/` - Configurações do GitHub Actions
 
 ## Pré-requisitos
 
