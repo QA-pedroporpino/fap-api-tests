@@ -14,6 +14,7 @@ $collections = @(
     "api-tests/collections/-api-v1-certificates.postman_collection.json",
     "api-tests/collections/-api-v1-clients.postman_collection.json",
     "api-tests/collections/-api-v1-clinics.postman_collection.json",
+    "api-tests/collections/-api-v1-consultations.postman_collection.json",
     "api-tests/collections/-api-v1-exams.postman_collection.json",
     "api-tests/collections/-api-v1-exams_prices.postman_collection.json",
     "api-tests/collections/-api-v1-health.postman_collection.json",

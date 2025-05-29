@@ -1,0 +1,462 @@
+{
+	"info": {
+		"_postman_id": "0abab662-a0d4-4e3e-814e-08b2701d90b5",
+		"name": "/api/v1/consultations",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37354928"
+	},
+	"item": [
+		{
+			"name": "Listar todas as consultas - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verificar se o status é 200 OK\r",
+							"pm.test(\"Status 200 OK\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"// Verificar se a resposta é um objeto\r",
+							"pm.test(\"Resposta é um objeto\", function () {\r",
+							"    let responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson).to.be.an(\"object\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/consultations",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"consultations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Criar uma nova consulta - 201 Created",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status da resposta é 201\", () => {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"const res = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Consulta foi criada com ID\", () => {\r",
+							"    pm.expect(res).to.have.property(\"id\");\r",
+							"    pm.environment.set(\"created_consultation_id\", res.id); // opcional para uso posterior\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Profissional e paciente vieram corretamente\", () => {\r",
+							"    pm.expect(res.professional_relation).to.be.an(\"object\");\r",
+							"    pm.expect(res.professional_relation.name).to.be.a(\"string\");\r",
+							"    pm.expect(res.patient_relation).to.be.an(\"object\");\r",
+							"    pm.expect(res.patient_relation.full_name).to.be.a(\"string\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Horário da consulta está dentro do expediente\", () => {\r",
+							"    const hour = new Date(res.start_time).getHours();\r",
+							"    pm.expect(hour).to.be.greaterThanOrEqual(8);\r",
+							"    pm.expect(hour).to.be.lessThan(18);\r",
+							"    pm.expect(hour).to.not.equal(12); // pula horário de almoço\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// IDs válidos\r",
+							"pm.environment.set(\"patient_id\", 15);\r",
+							"pm.environment.set(\"professional_id\", 1);\r",
+							"pm.environment.set(\"schedule_id\", 55);\r",
+							"\r",
+							"// Configurações de horário\r",
+							"const START_HOUR = 8;\r",
+							"const END_HOUR = 17;\r",
+							"const LUNCH_START = 12;\r",
+							"const LUNCH_END = 13;\r",
+							"const INTERVAL = 15; // minutos\r",
+							"\r",
+							"// Busca ou inicia data/hora base\r",
+							"let lastDateTime = pm.environment.get(\"last_valid_datetime\");\r",
+							"let date = lastDateTime ? new Date(lastDateTime) : new Date();\r",
+							"date.setSeconds(0);\r",
+							"date.setMilliseconds(0);\r",
+							"\r",
+							"// Avança INTERVAL minutos\r",
+							"date.setMinutes(date.getMinutes() + INTERVAL);\r",
+							"\r",
+							"// Se passou do horário final, avança para o próximo dia útil às 08h00\r",
+							"if (date.getHours() >= END_HOUR || \r",
+							"   (date.getHours() === END_HOUR - 1 && date.getMinutes() > 45)) {\r",
+							"    date.setDate(date.getDate() + 1);\r",
+							"    date.setHours(START_HOUR);\r",
+							"    date.setMinutes(0);\r",
+							"}\r",
+							"\r",
+							"// Pula sábado e domingo\r",
+							"while (date.getDay() === 0 || date.getDay() === 6) {\r",
+							"    date.setDate(date.getDate() + 1);\r",
+							"    date.setHours(START_HOUR);\r",
+							"    date.setMinutes(0);\r",
+							"}\r",
+							"\r",
+							"// Pula intervalo de almoço\r",
+							"if (date.getHours() === LUNCH_START || \r",
+							"   (date.getHours() === LUNCH_START - 1 && date.getMinutes() >= 45)) {\r",
+							"    date.setHours(LUNCH_END);\r",
+							"    date.setMinutes(0);\r",
+							"}\r",
+							"\r",
+							"// Atualiza env var para próxima execução\r",
+							"pm.environment.set(\"last_valid_datetime\", date.toISOString());\r",
+							"pm.environment.set(\"start_time\", date.toISOString().split('.')[0]);\r",
+							"pm.environment.set(\"status_consultation\", \"AGENDADO\");\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"start_time\": \"{{start_time}}\",\r\n  \"patient_id\": {{patient_id}},\r\n  \"professional_id\": {{professional_id}},\r\n  \"schedule_id\": {{schedule_id}},\r\n  \"is_encaixe\": false,\r\n  \"status\": \"{{status_consultation}}\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/consultations",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"consultations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obter uma Consulta por ID - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status da resposta é 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const res = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Consulta existe e tem ID\", () => {\r",
+							"    pm.expect(res).to.have.property(\"id\", parseInt(pm.environment.get(\"created_consultation_id\")));\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Profissional e paciente vieram corretamente\", () => {\r",
+							"    pm.expect(res.professional_relation.name).to.be.a(\"string\");\r",
+							"    pm.expect(res.patient_relation.full_name).to.be.a(\"string\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/consultations/{{created_consultation_id}}",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"consultations",
+						"{{created_consultation_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Atualizar uma consulta existente - 200 OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status da resposta é 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const res = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status da consulta foi atualizado (sem diferenciar maiúsculas)\", () => {\r",
+							"    const esperado = pm.environment.get(\"status_to_update\").toLowerCase();\r",
+							"    const retornado = res.status.toLowerCase();\r",
+							"    pm.expect(retornado).to.eql(esperado);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Atualizando status para algo permitido (ajuste conforme enum real)\r",
+							"pm.environment.set(\"status_to_update\", \"REALIZADO\");\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"status\": \"{{status_to_update}}\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/consultations/{{created_consultation_id}}",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"consultations",
+						"{{created_consultation_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deletar uma Consulta - 204 No Content",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status da resposta é 204 (sem conteúdo)\", () => {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://fap-clinic.stage.b2b.kompa.com.br/api/v1/consultations/{{created_consultation_id}}",
+					"protocol": "https",
+					"host": [
+						"fap-clinic",
+						"stage",
+						"b2b",
+						"kompa",
+						"com",
+						"br"
+					],
+					"path": [
+						"api",
+						"v1",
+						"consultations",
+						"{{created_consultation_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{bearer_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"const token = pm.globals.get('bearer_token');\r",
+					"\r",
+					"if (token) {\r",
+					"    pm.request.headers.upsert({\r",
+					"        key: 'Authorization',\r",
+					"        value: `Bearer ${token}`\r",
+					"    });\r",
+					"} else {\r",
+					"    console.warn('Token não encontrado na variável global.');\r",
+					"}\r",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "{{bearer_token}}",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
